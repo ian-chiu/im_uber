@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  mongodb:
+    container_name: mongodb
+    image: "mongo"
+    ports:
+      - 27017:27017
+    volumes:
+      - data:/data/db
+  server:
+    container_name: ride-sharing-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - ./server/src:/app/src
+    depends_on:
+      - mongodb
+  client:
+    container_name: ride-sharing-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./client/src:/app/src
+    stdin_open: true
+    tty: true
+    depends_on:
+      - server
+
+volumes:
+  data:

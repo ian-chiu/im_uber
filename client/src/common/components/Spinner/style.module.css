@@ -1,0 +1,16 @@
+.loading {
+    position: absolute;
+    z-index: 5000;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    opacity: 0.8;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.hide {
+    display: none;
+}
