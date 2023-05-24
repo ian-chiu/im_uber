@@ -1,0 +1,20 @@
+.deck {
+  width: auto
+}
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+}
+.container2 .textContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.container2 .textContainer .label {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+}
+.divider {
+  border: white solid 1px;
+}
