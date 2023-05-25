@@ -1,20 +1,26 @@
+.pageContainer {
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+.mapContainer {
+  flex: 1;
+  overflow-y: hidden;
+}
 .deck {
-  width: auto
+  flex: 1;
+  overflow-y: scroll;
 }
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
+.cardTitle {
+  margin: 0;
 }
-.container2 .textContainer {
+.cardBody {
+  padding: 0;
+}
+.listGroupItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.container2 .textContainer .label {
-  display: flex;
-  align-items: center;
-  margin-right: 15px;
-}
-.divider {
-  border: white solid 1px;
 }
