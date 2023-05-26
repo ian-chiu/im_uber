@@ -1,3 +1,4 @@
+import "./style.css";
 import styles from "./style.module.css";
 import { GoogleMap, useJsApiLoader, MarkerF, DirectionsRenderer } from "@react-google-maps/api";
 import { Card, Button, ListGroup, CloseButton } from "react-bootstrap";
@@ -6,11 +7,6 @@ import { IoMdPerson, IoMdArrowBack, IoMdAddCircleOutline } from "react-icons/io"
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { useNavigate } from "react-router";
-
-const containerStyle = {
-  width: "auto",
-  height: "400px",
-};
 
 const libraries = ["places"];
 
@@ -150,7 +146,6 @@ const Map = forwardRef((props, _ref) => {
             center={center}
             className={styles.mapContainer}
             mapContainerClassName="map-container"
-            mapContainerStyle={containerStyle}
             options={{
               disableDefaultUI: true,
             }}
