@@ -201,7 +201,11 @@ const Map = forwardRef((props, _ref) => {
                 <Dropdown.Menu>
                   {locations
                     ? locations.map((location, index) => (
-                        <Dropdown.Item key={index} eventKey={index}>
+                        <Dropdown.Item
+                          key={index}
+                          eventKey={index}
+                          disabled={stops.some((stop) => index.toString() === stop.id)}
+                        >
                           {location.name}
                         </Dropdown.Item>
                       ))
