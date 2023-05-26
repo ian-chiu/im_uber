@@ -60,7 +60,6 @@ const CreateRide = () => {
     if (!!errors.lisensePlate || !!errors.departureTime || !!errors.maxPassengers || !!errors.route) {
       console.log("Form submitted successfully");
     }
-    console.log(stops);
   };
   const handleLisensePlateChange = (event) => {
     setValues((prevValues) => ({ ...prevValues, lisensePlate: event.target.value }));
@@ -70,9 +69,6 @@ const CreateRide = () => {
   };
   const handleMaxPassengersChange = (event) => {
     setValues((prevValues) => ({ ...prevValues, maxPassengers: event.target.value }));
-  };
-  const handleRouteChange = (event) => {
-    setValues((prevValues) => ({ ...prevValues, route: event.target.value }));
   };
 
   return (
@@ -150,6 +146,7 @@ const CreateRide = () => {
           handleGoBack={handleModalHide}
           stops={stops}
           arrivalTimes={arrivalTimes}
+          departureTime={values.departureTime}
           ref={mapPageRef}
         />
       </Modal>

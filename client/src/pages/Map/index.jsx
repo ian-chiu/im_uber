@@ -111,6 +111,9 @@ const Map = forwardRef((props, _ref) => {
     if (props.arrivalTimes) {
       setArrivalTimes(props.arrivalTimes);
     }
+    if (props.departureTime) {
+      setDepartureTime(new Date(props.departureTime));
+    }
   }, []);
 
   useEffect(() => {
