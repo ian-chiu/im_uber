@@ -1,24 +1,37 @@
 import styles from "./style.module.css";
-import { GoogleMap, useJsApiLoader, MarkerF, DirectionsRenderer } from "@react-google-maps/api";
-import { Card, Button, ListGroup, CloseButton } from "react-bootstrap";
-import { RiSteering2Fill } from "react-icons/ri";
-import { IoMdPerson, IoMdArrowBack, IoMdAddCircleOutline } from "react-icons/io";
+import { GoogleMap, useJsApiLoader, DirectionsRenderer } from "@react-google-maps/api";
+import { Button } from "react-bootstrap";
+import { IoMdArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import SetRoute from "./components/SetRoute";
+import ViewRide from "./components/ViewRide";
 
 const libraries = ["places"];
 
 const Map = forwardRef((props, _ref) => {
   const naviagte = useNavigate();
+  const location = useLocation();
 
   const [center, setCenter] = useState({ lat: 23.584, lng: 121.178 });
   const [zoom, setZoom] = useState(7);
   const [directionResponse, setDirectionResponse] = useState(null);
   const [departureTime, setDepartureTime] = useState(new Date());
-  const [locations, setLocations] = useState(null);
+  const [spots, setSpots] = useState(null);
   const [stops, setStops] = useState([]);
   const [arrivalTimes, setArrivalTimes] = useState([]);
+
+  let deck = null;
+  if (location.pathname.split('/')[1] === "create-ride") {
+    deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
+  } else if (location.pathname.split('/')[1] === "ride") {
+    deck = <ViewRide stops={stops} setStops={setStops} arrivalTimes={arrivalTimes} />;
+  }
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
 
   const calculateRoutes = async () => {
     if (stops.length === 0) {
@@ -67,22 +80,6 @@ const Map = forwardRef((props, _ref) => {
     setArrivalTimes(updatedArrivalTimes);
   };
 
-  const handleSelectLocation = (eventKey) => {
-    const newStop = {
-      id: eventKey,
-      name: locations[eventKey].name,
-      position: new window.google.maps.LatLng(
-        locations[eventKey].latitude,
-        locations[eventKey].longitude
-      ),
-    };
-    setStops((prevStops) => [...prevStops, newStop]);
-  };
-
-  const handleRemoveStop = (removeId) => {
-    setStops((prevStops) => prevStops.filter((stop) => stop.id !== removeId));
-  };
-
   const handleGoBack = () => {
     if (props.handleGoBack) {
       props.handleGoBack();
@@ -91,18 +88,13 @@ const Map = forwardRef((props, _ref) => {
     }
   };
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries,
-  });
-
   useEffect(() => {
     fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/stops")
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        setLocations(data);
+        setSpots(data);
       });
     if (props.stops) {
       setStops(props.stops);
@@ -158,63 +150,7 @@ const Map = forwardRef((props, _ref) => {
           <div>Loading...</div>
         )}
       </div>
-      <Card className={styles.deck}>
-        <Card.Header className={styles.cardHeader}>
-          <Card.Title className={styles.cardTitle}>路線規劃</Card.Title>
-        </Card.Header>
-        <Card.Body className={styles.cardBody}>
-          <ListGroup variant="flush">
-            {arrivalTimes && arrivalTimes.length == stops.length
-              ? stops.map((stop, index) => (
-                  <ListGroup.Item key={index} className={styles.listGroupItem}>
-                    <div className={styles.container1}>
-                      <div>{stop.name}</div>
-                      <div>
-                        {arrivalTimes
-                          ? `${arrivalTimes[index].getHours()}:${arrivalTimes[index]
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, "0")}`
-                          : "loading..."}
-                      </div>
-                    </div>
-                    <div className={styles.container2}>
-                      <CloseButton
-                        onClick={() => {
-                          handleRemoveStop(stop.id);
-                        }}
-                      />
-                    </div>
-                  </ListGroup.Item>
-                ))
-              : null}
-            <ListGroup.Item>
-              <Dropdown
-                onSelect={handleSelectLocation}
-                style={{ display: "flex", justifyContent: "center" }}
-                drop="down-centered"
-              >
-                <Dropdown.Toggle variant="outline-secondary">
-                  <IoMdAddCircleOutline fontSize="1.3em" /> 新增站點
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {locations
-                    ? locations.map((location, index) => (
-                        <Dropdown.Item
-                          key={index}
-                          eventKey={index}
-                          disabled={stops.some((stop) => index.toString() === stop.id)}
-                        >
-                          {location.name}
-                        </Dropdown.Item>
-                      ))
-                    : null}
-                </Dropdown.Menu>
-              </Dropdown>
-            </ListGroup.Item>
-          </ListGroup>
-        </Card.Body>
-      </Card>
+      {deck}
     </div>
   );
 });

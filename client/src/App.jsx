@@ -16,6 +16,7 @@ function App() {
       <Routes>
         <Route path="map" element={<Map />} />
         <Route path="create-ride" element={<CreateRide />} />
+        <Route path="ride/:id" element={<Map />} />
       </Routes>
       <ToastContainer />
       <Spinner isLoading={isLoading} message={"loading"} />
