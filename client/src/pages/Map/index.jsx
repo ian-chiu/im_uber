@@ -1,10 +1,11 @@
 import styles from "./style.module.css";
 import { GoogleMap, useJsApiLoader, MarkerF, DirectionsRenderer } from "@react-google-maps/api";
-import { Container, Card, Button, ListGroup, CloseButton } from "react-bootstrap";
+import { Card, Button, ListGroup, CloseButton } from "react-bootstrap";
 import { RiSteering2Fill } from "react-icons/ri";
-import { IoMdPerson, IoMdAddCircleOutline } from "react-icons/io";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { IoMdPerson, IoMdArrowBack, IoMdAddCircleOutline } from "react-icons/io";
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
+import { useNavigate } from "react-router";
 
 const containerStyle = {
   width: "auto",
@@ -13,7 +14,9 @@ const containerStyle = {
 
 const libraries = ["places"];
 
-const Map = () => {
+const Map = forwardRef((props, _ref) => {
+  const naviagte = useNavigate();
+
   const [center, setCenter] = useState({ lat: 23.584, lng: 121.178 });
   const [zoom, setZoom] = useState(7);
   const [directionResponse, setDirectionResponse] = useState(null);
@@ -85,6 +88,14 @@ const Map = () => {
     setStops((prevStops) => prevStops.filter((stop) => stop.id !== removeId));
   };
 
+  const handleGoBack = () => {
+    if (props.handleGoBack) {
+      props.handleGoBack();
+    } else {
+      naviagte(-1);
+    }
+  };
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
@@ -98,6 +109,12 @@ const Map = () => {
       .then((data) => {
         setLocations(data);
       });
+    if (props.stops) {
+      setStops(props.stops);
+    }
+    if (props.arrivalTimes) {
+      setArrivalTimes(props.arrivalTimes);
+    }
   }, []);
 
   useEffect(() => {
@@ -112,8 +129,20 @@ const Map = () => {
     setCenter(bounds.getCenter());
   }, [stops]);
 
+  useImperativeHandle(_ref, () => ({
+    getStops: () => {
+      return stops;
+    },
+    getArrivalTimes: () => {
+      return arrivalTimes;
+    },
+  }));
+
   return (
     <div className={styles.pageContainer}>
+      <Button className={styles.goBackButton} variant="secondary" onClick={handleGoBack}>
+        <IoMdArrowBack />
+      </Button>
       <div className={styles.mapContainer}>
         {isLoaded ? (
           <GoogleMap
@@ -187,6 +216,6 @@ const Map = () => {
       </Card>
     </div>
   );
-};
+});
 
 export default Map;
