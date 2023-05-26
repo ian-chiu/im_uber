@@ -1,4 +1,3 @@
-import "./style.css";
 import styles from "./style.module.css";
 import { GoogleMap, useJsApiLoader, MarkerF, DirectionsRenderer } from "@react-google-maps/api";
 import { Card, Button, ListGroup, CloseButton } from "react-bootstrap";

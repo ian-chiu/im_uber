@@ -1,4 +1,3 @@
-import "./style.css";
 import "react-datetime/css/react-datetime.css";
 import styles from "./style.module.css";
 import { useRef, useState } from "react";
