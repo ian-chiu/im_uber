@@ -1,4 +1,4 @@
-import styles from "../../style.module.css";
+import styles from "./style.module.css";
 import { Card, ListGroup, CloseButton, Dropdown } from "react-bootstrap";
 import { IoMdAddCircleOutline } from "react-icons/io";
 

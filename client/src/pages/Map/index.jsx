@@ -22,10 +22,19 @@ const Map = forwardRef((props, _ref) => {
   const [arrivalTimes, setArrivalTimes] = useState([]);
 
   let deck = null;
-  if (location.pathname.split('/')[1] === "create-ride") {
+  if (location.pathname.split("/")[1] === "create-ride") {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
-  } else if (location.pathname.split('/')[1] === "ride") {
-    deck = <ViewRide stops={stops} setStops={setStops} arrivalTimes={arrivalTimes} />;
+  } else if (location.pathname.split("/")[1] === "ride") {
+    deck = (
+      <ViewRide
+        stops={stops}
+        setStops={setStops}
+        setDepartureTime={setDepartureTime}
+        departureTime={departureTime}
+        spots={spots}
+        arrivalTimes={arrivalTimes}
+      />
+    );
   }
 
   const { isLoaded } = useJsApiLoader({

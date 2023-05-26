@@ -10,21 +10,6 @@
   flex: 1;
   overflow-y: hidden;
 }
-.deck {
-  flex: 1;
-  overflow-y: scroll;
-}
-.cardTitle {
-  margin: 0;
-}
-.cardBody {
-  padding: 0;
-}
-.listGroupItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 .goBackButton {
   position: absolute;
   z-index: 10;
