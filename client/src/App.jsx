@@ -1,23 +1,26 @@
-import './style.css'
+import "./style.css";
 
 import { useState } from "react";
-import { Routes } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
+import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
-import Header from "~/common/components/Header";
 import Spinner from "~/common/components/Spinner";
 
+import Map from "./pages/Map";
+import CreateRide from "./pages/CreateRide";
+
 function App() {
-	const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <>
-    <Header />
-    <Routes>
-    </Routes>
-    <ToastContainer />
-    <Spinner isLoading={isLoading} message={"loading"}/>
+      <Routes>
+        <Route path="map" element={<Map />} />
+        <Route path="create-ride" element={<CreateRide />} />
+      </Routes>
+      <ToastContainer />
+      <Spinner isLoading={isLoading} message={"loading"} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
