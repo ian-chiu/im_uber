@@ -20,17 +20,33 @@ const Map = forwardRef((props, _ref) => {
   const [spots, setSpots] = useState(null);
   const [stops, setStops] = useState([]);
   const [arrivalTimes, setArrivalTimes] = useState([]);
+  const [ride, setRide] = useState(null);
 
   let deck = null;
   if (location.pathname.split("/")[1] === "create-ride") {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
   } else if (location.pathname.split("/")[1] === "ride") {
+    //TODO: use real user input
+    const userInput = {
+      from: {
+        name: "臺積電五廠",
+        latitude: 24.774451062456148,
+        longitude: 120.99816376901293,
+        id: 0,
+      },
+      to: {
+        name: "新竹市立動物園",
+        latitude: 24.80044826523704,
+        longitude: 120.97987888212046,
+        id: 2,
+      },
+    };
     deck = (
       <ViewRide
+        ride={ride}
+        userInput={userInput}
         stops={stops}
-        setStops={setStops}
         setDepartureTime={setDepartureTime}
-        departureTime={departureTime}
         spots={spots}
         arrivalTimes={arrivalTimes}
       />
@@ -105,14 +121,32 @@ const Map = forwardRef((props, _ref) => {
       .then((data) => {
         setSpots(data);
       });
-    if (props.stops) {
-      setStops(props.stops);
-    }
-    if (props.arrivalTimes) {
-      setArrivalTimes(props.arrivalTimes);
-    }
-    if (props.departureTime) {
-      setDepartureTime(new Date(props.departureTime));
+    if (location.pathname.split("/")[1] === "ride") {
+      fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/rides/asdf")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setRide(data[0]);
+          setStops(
+            data[0].stops.map((stop) => ({
+              id: stop.id,
+              name: stop.name,
+              position: new window.google.maps.LatLng(stop.latitude, stop.longitude),
+            }))
+          );
+          setDepartureTime(new Date(data[0]["departure_time"]));
+        });
+    } else if (location.pathname.split[1] === "create-ride") {
+      if (props.stops) {
+        setStops(props.stops);
+      }
+      if (props.arrivalTimes) {
+        setArrivalTimes(props.arrivalTimes);
+      }
+      if (props.departureTime) {
+        setDepartureTime(new Date(props.departureTime));
+      }
     }
   }, []);
 
@@ -139,9 +173,9 @@ const Map = forwardRef((props, _ref) => {
 
   return (
     <div className={styles.pageContainer}>
-      <Button className={styles.goBackButton} variant="secondary" onClick={handleGoBack}>
+      <div className={styles.goBackButton} onClick={handleGoBack}>
         <IoMdArrowBack />
-      </Button>
+      </div>
       <div className={styles.mapContainer}>
         {isLoaded ? (
           <GoogleMap
