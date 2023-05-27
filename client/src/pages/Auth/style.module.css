@@ -1,0 +1,28 @@
+.page {
+    position: relative;
+    height: 100%;
+    width: 100vw;
+}
+
+.content {
+    flex: 1;
+    height: 100%;
+}
+.form {
+    width: 450px;
+    max-width: 80%;
+}
+.left {
+    background-color: rgb(var(--red));
+}
+
+.right {
+    position: relative;
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .page {
+        flex-direction: column;
+    }
+}

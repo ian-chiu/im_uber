@@ -1,0 +1,29 @@
+.tickets {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.searchContainer {
+    bottom: 0;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: white;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+.bannerContent {
+    margin-bottom: -30px;
+}
+.banner {
+    position: relative;
+    background-image: url('/banner.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+}
