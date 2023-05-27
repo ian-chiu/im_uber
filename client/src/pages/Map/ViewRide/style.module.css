@@ -43,6 +43,9 @@
   /* max-width: 110px; */
   margin: 5px;
 }
+.infoContainer .card:first-child {
+  margin-top: 1rem;
+}
 .infoContainer .card {
   margin-bottom: 1rem;
 }
