@@ -1,7 +1,6 @@
 import styles from "./style.module.css";
 import { GoogleMap, useJsApiLoader, DirectionsRenderer } from "@react-google-maps/api";
-import { Button } from "react-bootstrap";
-import { IoMdArrowBack } from "react-icons/io";
+import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import SetRoute from "./SetRoute";
@@ -23,7 +22,7 @@ const Map = forwardRef((props, _ref) => {
   const [ride, setRide] = useState(null);
 
   let deck = null;
-  if (location.pathname.split("/")[1] === "create-ride") {
+  if (location.pathname.includes("/driver/create-ride")) {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
   } else if (location.pathname.split("/")[1] === "ride") {
     //TODO: use real user input
@@ -46,11 +45,20 @@ const Map = forwardRef((props, _ref) => {
         ride={ride}
         userInput={userInput}
         stops={stops}
-        setDepartureTime={setDepartureTime}
         spots={spots}
         arrivalTimes={arrivalTimes}
       />
     );
+  } else if (location.pathname.split("/")[1] === "driver") {
+    deck = (
+      <ViewRide
+        ride={ride}
+        stops={stops}
+        spots={spots}
+        arrivalTimes={arrivalTimes}
+      />
+    );
+
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -121,7 +129,7 @@ const Map = forwardRef((props, _ref) => {
       .then((data) => {
         setSpots(data);
       });
-    if (location.pathname.split("/")[1] === "ride") {
+    if (location.pathname.split("/")[1] === "ride" || location.pathname.split("/")[2] === "ride") {
       fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/rides/asdf")
         .then((response) => {
           return response.json();
@@ -174,7 +182,7 @@ const Map = forwardRef((props, _ref) => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.goBackButton} onClick={handleGoBack}>
-        <IoMdArrowBack />
+        <IoIosArrowBack />
       </div>
       <div className={styles.mapContainer}>
         {isLoaded ? (

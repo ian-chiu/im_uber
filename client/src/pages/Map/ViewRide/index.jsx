@@ -1,8 +1,10 @@
 import styles from "./style.module.css";
 import { Card, ListGroup, Tab, Tabs, Button } from "react-bootstrap";
+import { useLocation } from "react-router";
 import { getTimeString, getDateString } from "~/utils/time";
 
 const ViewRide = (props) => {
+  const location = useLocation();
   const { stops, ride, userInput, arrivalTimes } = props;
 
   const passengerStopIndex = {
@@ -19,12 +21,39 @@ const ViewRide = (props) => {
     }
   }
 
+  let bottomPanel = null;
+  if (location.pathname.split("/")[1] === "ride") {
+    bottomPanel = (
+      <Card.Body className={styles.bottomPanel}>
+        <Button size="sm" className={styles.joinRideButton}>
+          加入共乘
+        </Button>
+        <div className={styles.infoTexts}>
+          <div>票價NTD100</div>
+        </div>
+      </Card.Body>
+    );
+  } else if (ride && location.pathname.split("/")[1] === "driver") {
+    bottomPanel = (
+      <Card.Body className={styles.bottomPanel}>
+        <Button size="sm" className={styles.joinRideButton}>
+          發車
+        </Button>
+        <div className={styles.infoTexts}>
+          <div>收入NTD100</div>
+        </div>
+      </Card.Body>
+    );
+  }
+
   return (
     <Card className={styles.deck}>
       <div className={styles.deck}>
         <Tabs defaultActiveKey="ride-route" fill>
           <Tab eventKey="ride-route" title="路線">
-            <Card.Header classname="border-bottom">{`日期：${arrivalTimes.length > 0 ? getDateString(arrivalTimes[0]) : "loading..."}`}</Card.Header>
+            <Card.Header className="border-bottom">{`日期：${
+              arrivalTimes.length > 0 ? getDateString(arrivalTimes[0]) : "loading..."
+            }`}</Card.Header>
             <ListGroup variant="flush">
               {arrivalTimes && arrivalTimes.length == stops.length
                 ? stops.map((stop, index) => (
@@ -106,10 +135,7 @@ const ViewRide = (props) => {
           </Tab>
         </Tabs>
       </div>
-      <Card.Body className={styles.bottomPanel}>
-        <Button className={styles.joinRideButton}>加入共乘</Button>
-        <div className={styles.priceLabel}>NTD100</div>
-      </Card.Body>
+      {bottomPanel}
     </Card>
   );
 };
