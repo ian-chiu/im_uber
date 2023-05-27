@@ -4,8 +4,8 @@ import { Button } from "react-bootstrap";
 import { IoMdArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { useLocation, useNavigate } from "react-router";
-import SetRoute from "./components/SetRoute";
-import ViewRide from "./components/ViewRide";
+import SetRoute from "./SetRoute";
+import ViewRide from "./ViewRide";
 
 const libraries = ["places"];
 
