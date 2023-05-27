@@ -23,8 +23,9 @@ function App() {
         <Header/>
         <Routes>
           <Route path='*' element={<Home />} />
+          <Route path="driver/create-ride" exact element={<CreateRide />} />
+          <Route path="driver/ride/:id" exact element={<Map />} />
           <Route path="ride/:id" element={<Map />} />
-          <Route path="create-ride" element={<CreateRide />} />
         </Routes>
       </>
       : 
