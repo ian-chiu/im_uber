@@ -9,7 +9,7 @@ import Spinner from "~/common/components/Spinner";
 import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Map from "./pages/Map";
-import CreateRide from "./pages/CreateRide";
+import CreateRide from "./pages/Map/CreateRide";
 import Header from "./common/components/Header";
 import { useSelector } from 'react-redux';
 
