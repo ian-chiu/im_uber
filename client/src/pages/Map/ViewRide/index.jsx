@@ -7,16 +7,16 @@ const ViewRide = (props) => {
   const location = useLocation();
   const { stops, ride, userInput, arrivalTimes } = props;
 
-  const passengerStopIndex = {
+  const userInputStopIndex = {
     from: null,
     to: null,
   };
   if (userInput) {
     for (let i = 0; i < stops.length; i++) {
       if (stops[i].id === userInput.from.id) {
-        passengerStopIndex.from = i;
+        userInputStopIndex.from = i;
       } else if (stops[i].id === userInput.to.id) {
-        passengerStopIndex.to = i;
+        userInputStopIndex.to = i;
       }
     }
   }
@@ -46,44 +46,49 @@ const ViewRide = (props) => {
     );
   }
 
+  let stopListGroupItems = [];
+  if (stops) {
+    stops.forEach((stop, index) => {
+      const arrivalTime = arrivalTimes.find((arrivalTime) => arrivalTime.stopId === stop.id);
+      const item = (
+        <ListGroup.Item
+          key={index}
+          className={`${styles.listGroupItem} ${
+            userInput &&
+            (stop.id === userInput.from.id || stop.id === userInput.to.id
+              ? styles.targetStopText
+              : null)
+          }`}
+        >
+          <div className={`${arrivalTime ? "" : "text-muted"}`}>{stop.name}</div>
+          <div >
+            {arrivalTime
+              ? `${
+                  userInput
+                    ? stop.id === userInput.from.id
+                      ? "起點"
+                      : stop.id === userInput.to.id
+                      ? "終點"
+                      : ""
+                    : ""
+                } ${getTimeString(arrivalTime.date)}`
+              : ""}
+          </div>
+        </ListGroup.Item>
+      );
+      stopListGroupItems.push(item);
+    });
+  }
+
   return (
     <Card className={styles.deck}>
       <div className={styles.deck}>
         <Tabs defaultActiveKey="ride-route" fill>
           <Tab eventKey="ride-route" title="路線">
             <Card.Header className="border-bottom">{`日期：${
-              arrivalTimes.length > 0 ? getDateString(arrivalTimes[0]) : "loading..."
+              arrivalTimes.length > 0 ? getDateString(arrivalTimes[0].date) : "loading..."
             }`}</Card.Header>
-            <ListGroup variant="flush">
-              {arrivalTimes && arrivalTimes.length == stops.length
-                ? stops.map((stop, index) => (
-                    <ListGroup.Item
-                      key={index}
-                      className={`${styles.listGroupItem} ${
-                        userInput &&
-                        (stop.id === userInput.from.id || stop.id === userInput.to.id
-                          ? styles.targetStopText
-                          : null)
-                      }`}
-                    >
-                      <div>{stop.name}</div>
-                      <div>
-                        {arrivalTimes
-                          ? `${
-                              userInput
-                                ? stop.id === userInput.from.id
-                                  ? "起點"
-                                  : stop.id === userInput.to.id
-                                  ? "終點"
-                                  : ""
-                                : ""
-                            } ${getTimeString(arrivalTimes[index])}`
-                          : "loading..."}
-                      </div>
-                    </ListGroup.Item>
-                  ))
-                : null}
-            </ListGroup>
+            <ListGroup variant="flush">{stopListGroupItems}</ListGroup>
           </Tab>
           <Tab eventKey="ride-info" title="共乘資訊">
             {ride && arrivalTimes.length ? (
@@ -125,6 +130,18 @@ const ViewRide = (props) => {
                             <div className="small fw-bold">電話</div>
                             <div>{ticket.user.phone}</div>
                           </div>
+                          {location.pathname.split("/")[1] === "driver" ? (
+                            <>
+                              <div>
+                                <div className="small fw-bold">起點</div>
+                                <div>{ticket.from.name}</div>
+                              </div>
+                              <div>
+                                <div className="small fw-bold">終點</div>
+                                <div>{ticket.to.name}</div>
+                              </div>
+                            </>
+                          ) : null}
                         </ListGroup.Item>
                       ))}
                     </ListGroup>
