@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Button, Modal, Form, FloatingLabel, ListGroup, Card } from "react-bootstrap";
 import * as yup from "yup";
 import Datetime from "react-datetime";
-import Map from "../Map";
+import Map from "../index";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 const schema = yup.object().shape({
