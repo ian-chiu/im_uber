@@ -49,16 +49,8 @@ const Map = forwardRef((props, _ref) => {
         arrivalTimes={arrivalTimes}
       />
     );
-  } else if (location.pathname.split("/")[1] === "driver") {
-    deck = (
-      <ViewRide
-        ride={ride}
-        stops={stops}
-        spots={spots}
-        arrivalTimes={arrivalTimes}
-      />
-    );
-
+  } else if (location.pathname.includes("/driver/ride/")) {
+    deck = <ViewRide ride={ride} stops={stops} spots={spots} arrivalTimes={arrivalTimes} />;
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -72,7 +64,12 @@ const Map = forwardRef((props, _ref) => {
       setArrivalTimes([]);
       return;
     }
-    const updatedArrivalTimes = [new Date(departureTime)];
+    const updatedArrivalTimes = [
+      {
+        stopId: stops[0].id,
+        date: new Date(departureTime),
+      },
+    ];
     if (stops.length === 1) {
       setZoom(15);
       setArrivalTimes(updatedArrivalTimes);
@@ -81,7 +78,22 @@ const Map = forwardRef((props, _ref) => {
     }
 
     const waypoints = [];
+    const waypointStopIds = [];
+    const passengerStopIds = new Set();
+    if (ride && ride.tickets) {
+      for (let ticket of ride.tickets) {
+        passengerStopIds.add(ticket.from.id);
+        passengerStopIds.add(ticket.to.id);
+      }
+    }
+
     for (let i = 1; i < stops.length - 1; i++) {
+      if (location.pathname.includes("/driver/ride/")) {
+        if (!passengerStopIds.has(stops[i].id)) {
+          continue;
+        }
+      }
+      waypointStopIds.push(stops[i].id);
       waypoints.push({
         location: stops[i].position,
         stopover: true,
@@ -105,10 +117,11 @@ const Map = forwardRef((props, _ref) => {
       dateCopy.setSeconds(date.getSeconds() + seconds);
       return dateCopy;
     };
-    for (let i = 1; i < stops.length; i++) {
-      updatedArrivalTimes.push(
-        addSeconds(updatedArrivalTimes[i - 1], result.routes[0].legs[i - 1].duration.value)
-      );
+    for (let i = 0; i < result.routes[0].legs.length; i++) {
+      updatedArrivalTimes.push({
+        stopId: waypointStopIds[i] || stops[stops.length - 1].id,
+        date: addSeconds(updatedArrivalTimes[updatedArrivalTimes.length - 1].date, result.routes[0].legs[i].duration.value),
+      });
     }
     setArrivalTimes(updatedArrivalTimes);
   };
