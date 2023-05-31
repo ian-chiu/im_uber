@@ -10,7 +10,7 @@ function Auth(props) {
             <div className={['d-flex', styles.left, styles.content].join(' ')}>1</div>   
             <div  className={['d-flex justify-content-center align-items-center', styles.right, styles.content].join(' ')}>
                 <div className={styles.form}>
-                    <h3>Login</h3>
+                    <h3>{props.driver ? "Driver Login" : "Passenger Login"}</h3>
                     <Form>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label>Email address</Form.Label>
