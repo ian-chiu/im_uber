@@ -27,3 +27,13 @@
     justify-content: end;
     align-items: center;
 }
+.addRideBtn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    font-size: 18px;
+    transform: translateX(-50%);
+}
+.addRideBtn i {
+    padding-right: 10px;
+}

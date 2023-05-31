@@ -1,10 +1,22 @@
 import Badge from 'react-bootstrap/Badge';
 import styles from "./style.module.css"
 import { Link } from 'react-router-dom';
-function Ticket({ data }) {
+function Ticket({ data, linkto }) {
+	let status = "再過...發車"
+	let status_style = "bg-primary"
+	switch (data.status) {
+		case 1:
+			status = "正在進行"
+			status_style = "bg-danger"
+			break;
+		case 2:
+			status = "已完成"
+			status_style = "bg-dark"
+	}
 	return (
-        <Link to="/ride/1" className={styles.ticket}>
+        <Link to={linkto} className={styles.ticket}>
 			<div className={`${styles.header}`}>
+				<div className={`${styles.rideStatus} small ${status_style}`}>{status}</div>
 				<div className="d-flex justify-content-between align-items-center">
 					<div>
 						<div className="small">{data.from}</div>
