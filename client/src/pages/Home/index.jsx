@@ -8,6 +8,7 @@ import Alert from 'react-bootstrap/Alert';
 import Datetime from 'react-datetime';
 import { Link } from 'react-router-dom';
 
+import Header from "~/common/components/Header";
 import Ticket from './Ticket'
 import axios from '~/app/axios'
 import styles from './style.module.css'
@@ -16,6 +17,7 @@ import { useState } from 'react';
 
 
 function Home(props) {
+	console.log(props.driver)
 	const [arrival, setArrival] = useState(0)
 	const [departure, setDeparture] = useState(1)
 	const [departureTime, setDepartureTime] = useState(new Date())
@@ -45,11 +47,14 @@ function Home(props) {
 			</Button>
 		</InputGroup>
 	)
-	return (
+	return (<>
+		<Header/>
         <Routes>
+			{/* {props.driver && <Route path='*' element={<Search searchInput={searchInput} />}/>} */}
 			<Route path='/search' element={<Search searchInput={searchInput} />} />
 			<Route path='*' element={
 				<>
+				{!props.driver && (
 					<div className={styles.banner}>
 						<Container className={styles.bannerContent}>
 							<h4 className='text-white'>搜尋共乘</h4>
@@ -57,7 +62,8 @@ function Home(props) {
 								{searchInput}
 							</div>
 						</Container>
-					</div>	
+					</div>
+				)}
 					<Container className='pt-5'>
 						<Alert variant={"danger"} className='p-2 small'>
 							<i className="fa-solid fa-circle-exclamation m-1"></i>
@@ -66,12 +72,17 @@ function Home(props) {
 						<h4>我的共乘</h4>
 						<div className={styles.tickets}>
 							{data.map((data, index) => {
-								return <Ticket key={index} data={data}/> 
+								return <Ticket key={index} linkto={props.driver ? "/driver/ride/1" : "/ride/1"} data={data}/> 
 							})}
 						</div>
 					</Container>
+					{
+						props.driver &&
+						<Button as={Link} to="/driver/create-ride" variant={"danger"} className={styles.addRideBtn}><i class="fa-solid fa-circle-plus"></i>新增共乘</Button>
+					}
 				</>} />
         </Routes>
+	</>
 	)
 }
 
@@ -85,6 +96,7 @@ var data = [
 		"driver": {
 			"name": "邱士權"
 		},
+		"status": 1,
 		"passengers": [
 			{
 				"name": "邱士懿"
@@ -106,6 +118,7 @@ var data = [
 		"driver": {
 			"name": "邱士權"
 		},
+		"status": 0,
 		"passengers": [
 			{
 				"name": "邱士懿"
@@ -127,6 +140,7 @@ var data = [
 		"driver": {
 			"name": "邱士權"
 		},
+		"status": 0,
 		"passengers": [
 			{
 				"name": "邱士懿"
@@ -148,6 +162,7 @@ var data = [
 		"driver": {
 			"name": "邱士權"
 		},
+		"status": 2,
 		"passengers": [
 			{
 				"name": "邱士懿"
@@ -169,6 +184,7 @@ var data = [
 		"driver": {
 			"name": "邱士權"
 		},
+		"status": 2,
 		"passengers": [
 			{
 				"name": "邱士懿"
@@ -180,7 +196,7 @@ var data = [
 			"license_plate": "ABC-1234",
 			"seats": 5
 		}
-	}
+	}, 
 ]
 
 export default Home
