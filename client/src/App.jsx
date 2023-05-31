@@ -10,7 +10,6 @@ import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Map from "./pages/Map";
 import CreateRide from "./pages/Map/CreateRide";
-import Header from "./common/components/Header";
 import { useSelector } from 'react-redux';
 
 function App() {
@@ -18,19 +17,25 @@ function App() {
 	const [isLoading, setIsLoading] = useState(false)
   return (
     <>
-    {isAuth ? 
-      <>
-        <Header/>
+    <Routes>
+      <Route path="/driver/*" element={isAuth ? 
+        <Routes>
+          <Route path='*' element={<Home driver={true}/>}/>
+          <Route path="ride/:id" element={<Map />} />
+          <Route path="/create-ride" element={<CreateRide/>} />
+        </Routes>
+        : 
+        <Auth driver={true}/>
+      }/>
+      <Route path="*" element={isAuth ? 
         <Routes>
           <Route path='*' element={<Home />} />
-          <Route path="driver/create-ride" exact element={<CreateRide />} />
-          <Route path="driver/ride/:id" exact element={<Map />} />
           <Route path="ride/:id" element={<Map />} />
         </Routes>
-      </>
-      : 
-      <Auth />
-    }
+        :
+        <Auth/>
+      }/>
+    </Routes>
     <ToastContainer />
     <Spinner isLoading={isLoading} message={"loading"}/>
     </>

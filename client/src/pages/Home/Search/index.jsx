@@ -34,7 +34,7 @@ function Home(props) {
 				</Alert>
 				<div className={styles.tickets}>
 					{data.map((data, index) => {
-						return <Ticket key={index} data={data}/> 
+						return <Ticket linkto={"/ride/1"} key={index} data={data}/> 
 					})}
 				</div>
 			</Container>
