@@ -1,13 +1,21 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { StopsController } from './stops/stops.controller';
-import { StopsService } from './stops/stops.service';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AppController } from 'src/app.controller';
+import { AppService } from 'src/app.service';
+import { StopsController } from 'src/stops/stops.controller';
+import { StopsService } from 'src/stops/stops.service';
+import { AuthModule } from 'src/auth/auth.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [AuthModule, UsersModule],
+  imports: [
+    UsersModule,
+    AuthModule,
+    MongooseModule.forRoot(
+      //database url string
+      'mongodb://localhost:27017/uber',
+    ),
+  ],
   controllers: [AppController, StopsController],
   providers: [AppService, StopsService],
 })

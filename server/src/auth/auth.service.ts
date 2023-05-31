@@ -1,22 +1,27 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  async signIn(username, pass) {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+  //validate a user
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.usersService.getUser(username);
+    const passwordValid = await bcrypt.compare(password, user.password);
+
+    if (!user) {
+      throw new NotAcceptableException('could not find the user');
     }
-    const payload = { sub: user.userId, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+
+    if (user && passwordValid) {
+      return {
+        userId: user.id,
+        userName: user.username,
+      };
+    }
+
+    throw new NotAcceptableException('password is not valid');
   }
 }

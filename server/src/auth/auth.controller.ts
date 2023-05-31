@@ -2,27 +2,56 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Post,
+  UseGuards,
   Request,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { Public } from './decorators/public.decorator';
+
+import * as bcrypt from 'bcrypt';
+import { AuthenticatedGuard } from 'src/auth/auth.guard';
+import { LocalAuthGuard } from 'src/auth/local.auth.guard';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @Public()
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+  //post/ signup
+  @Post('/signup')
+  async addUser(
+    @Body('password') userPassword: string,
+    @Body('username') userName: string,
+  ) {
+    //hash password
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(userPassword, saltOrRounds);
+
+    const result = await this.usersService.insertUser(userName, hashedPassword);
+    return {
+      msg: 'User successfully registered',
+      userId: result.id,
+      userName: result.username,
+    };
   }
 
-  @Get('profile')
-  getProfile(@Request() req) {
+  //Post / Login
+  @UseGuards(LocalAuthGuard)
+  @Post('/login')
+  login(@Request() req): any {
+    return { User: req.user, msg: 'User logged in' };
+  }
+
+  //Get / protected
+  @UseGuards(AuthenticatedGuard)
+  @Get('/protected')
+  getHello(@Request() req): string {
     return req.user;
+  }
+
+  //Get / logout
+  @Get('/logout')
+  logout(@Request() req): any {
+    req.session.destroy();
+    return { msg: 'The user session has ended' };
   }
 }
