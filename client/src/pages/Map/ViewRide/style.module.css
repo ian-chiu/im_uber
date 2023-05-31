@@ -20,14 +20,16 @@
   align-items: center;
   background: white;
   max-height: 50px;
+  padding: 10px;
 }
 .joinRideButton {
   width: 100%;
 }
-.priceLabel {
-  text-align: center;
-  font-size: 16px;
+.infoTexts {
+  text-align: left;
+  font-size: 14px;
   margin-left: 10px;
+  min-width: 90px;
 }
 .infoContainer {
   padding: 0px 10px;
@@ -42,6 +44,9 @@
   min-width: 120px;
   /* max-width: 110px; */
   margin: 5px;
+}
+.infoContainer .card:first-child {
+  margin-top: 1rem;
 }
 .infoContainer .card {
   margin-bottom: 1rem;
