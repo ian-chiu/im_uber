@@ -6,6 +6,7 @@ import { AppService } from 'src/app.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import { StopsModule } from './stops/stops.module';
+import { CarsModule } from './cars/cars.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { StopsModule } from './stops/stops.module';
       `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/uber?retryWrites=true&w=majority`,
     ),
     StopsModule,
+    CarsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
