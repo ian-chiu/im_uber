@@ -9,12 +9,10 @@ export class AuthService {
   //validate a user
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.getUser(username);
-    const passwordValid = await bcrypt.compare(password, user.password);
-
     if (!user) {
-      throw new NotAcceptableException('could not find the user');
+      throw new NotAcceptableException('username or password is not valid');
     }
-
+    const passwordValid = await bcrypt.compare(password, user.password);
     if (user && passwordValid) {
       return {
         userId: user.id,
@@ -22,6 +20,6 @@ export class AuthService {
       };
     }
 
-    throw new NotAcceptableException('password is not valid');
+    throw new NotAcceptableException('username or password is not valid');
   }
 }
