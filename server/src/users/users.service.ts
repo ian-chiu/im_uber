@@ -3,6 +3,7 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/users/users.model';
@@ -32,5 +33,23 @@ export class UsersService {
     const username = userName.toLowerCase();
     const user = await this.userModel.findOne({ username });
     return user;
+  }
+
+  async updateUserRole(
+    username: string,
+    newRole: string,
+  ): Promise<{ username: string; role: string }> {
+    if (newRole !== 'driver' && newRole !== 'passenger') {
+      throw new BadRequestException('Invalid role');
+    }
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      { username },
+      { role: newRole },
+      { new: true },
+    );
+    if (!updatedUser) {
+      throw new NotFoundException(`User ${username} not found`);
+    }
+    return { username: updatedUser.username, role: updatedUser.role };
   }
 }
