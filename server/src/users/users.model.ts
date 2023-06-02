@@ -11,6 +11,12 @@ export const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      required: true,
+      enum: ['passenger', 'driver'],
+      default: 'passenger', // default role is 'passenger'
+    },
   },
   { timestamps: true },
 );
@@ -20,4 +26,5 @@ export interface User extends mongoose.Document {
   _id: string;
   username: string;
   password: string;
+  role: string;
 }
