@@ -2,10 +2,11 @@ import styles from "./style.module.css";
 import { Card, ListGroup, Tab, Tabs, Button } from "react-bootstrap";
 import { useLocation } from "react-router";
 import { getTimeString, getDateString } from "~/utils/time";
+import { useEffect } from "react";
 
 const ViewRide = (props) => {
   const location = useLocation();
-  const { stops, ride, userInput, arrivalTimes } = props;
+  const { stops, ride, userInput, arrivalTimes} = props;
 
   const userInputStopIndex = {
     from: null,
@@ -47,9 +48,7 @@ const ViewRide = (props) => {
     if (ride && ride.status == 1) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Card.Text>
-            任務...
-          </Card.Text>
+          <Card.Text>任務...</Card.Text>
         </Card.Body>
       );
     } else {
