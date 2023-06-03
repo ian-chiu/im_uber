@@ -23,27 +23,47 @@ const ViewRide = (props) => {
 
   let bottomPanel = null;
   if (location.pathname.split("/")[1] === "ride") {
-    bottomPanel = (
-      <Card.Body className={styles.bottomPanel}>
-        <Button size="sm" className={styles.joinRideButton}>
-          加入共乘
-        </Button>
-        <div className={styles.infoTexts}>
-          <div>票價NTD100</div>
-        </div>
-      </Card.Body>
-    );
+    if (ride && ride.status == 1) {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Button size="sm" className={styles.joinRideButton}>
+            駕駛完成任務
+          </Button>
+        </Card.Body>
+      );
+    } else {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Button size="sm" className={styles.joinRideButton}>
+            加入共乘
+          </Button>
+          <div className={styles.infoTexts}>
+            <div>票價NTD100</div>
+          </div>
+        </Card.Body>
+      );
+    }
   } else if (ride && location.pathname.split("/")[1] === "driver") {
-    bottomPanel = (
-      <Card.Body className={styles.bottomPanel}>
-        <Button size="sm" className={styles.joinRideButton}>
-          發車
-        </Button>
-        <div className={styles.infoTexts}>
-          <div>收入NTD100</div>
-        </div>
-      </Card.Body>
-    );
+    if (ride && ride.status == 1) {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Card.Text>
+            任務...
+          </Card.Text>
+        </Card.Body>
+      );
+    } else {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Button size="sm" className={styles.joinRideButton}>
+            發車
+          </Button>
+          <div className={styles.infoTexts}>
+            <div>收入NTD100</div>
+          </div>
+        </Card.Body>
+      );
+    }
   }
 
   let stopListGroupItems = [];
@@ -61,7 +81,7 @@ const ViewRide = (props) => {
           }`}
         >
           <div className={`${arrivalTime ? "" : "text-muted"}`}>{stop.name}</div>
-          <div >
+          <div>
             {arrivalTime
               ? `${
                   userInput
@@ -106,12 +126,12 @@ const ViewRide = (props) => {
                     </div>
                     <div>
                       <div className="small fw-bold">車牌</div>
-                      <div>{ride.vehicle.license_plate}</div>
+                      <div>{ride.license_plate}</div>
                     </div>
                     <div>
                       <div className="small fw-bold">載客人數</div>
                       <div>
-                        {ride.tickets.length} / {ride.vehicle.seats}人
+                        {ride.tickets.length} / {ride.seats}人
                       </div>
                     </div>
                   </Card.Body>

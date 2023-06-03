@@ -148,6 +148,7 @@ const Map = forwardRef((props, _ref) => {
           return response.json();
         })
         .then((data) => {
+          data[0].status = 1;
           setRide(data[0]);
           setStops(
             data[0].stops.map((stop) => ({
