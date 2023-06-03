@@ -27,15 +27,13 @@ export class CarsService {
     if (driver.role !== 'driver') {
       throw new BadRequestException('The driver must have a driver role');
     }
-    const utcDate = new Date(departureTime).toISOString();
+
     const newCar = new this.carModel({
       driver: driverUsername,
-      departure_time: utcDate,
+      departure_time: departureTime,
       stops,
       license_plate: licensePlate,
     });
-
-    console.log(newCar);
 
     try {
       await newCar.save();
@@ -49,13 +47,33 @@ export class CarsService {
     }
   }
 
-  async getCar(license_plate: string) {
-    const car = await this.carModel.findOne({ license_plate });
-    return car;
-  }
-
   async getCars(): Promise<Car[]> {
     const cars = await this.carModel.find().exec();
     return cars;
+  }
+
+  async getCarByDriver(driverUsername: string): Promise<Car> {
+    const car = await this.carModel.findOne({ driver: driverUsername }).exec();
+    if (!car) {
+      throw new BadRequestException('No car found for the given driver');
+    }
+    return car;
+  }
+
+  async updateGpsPosition(
+    driverUsername: string,
+    newGpsPosition: { latitude: number; longitude: number },
+  ) {
+    const car = await this.getCarByDriver(driverUsername);
+    car.gps_position = newGpsPosition;
+
+    try {
+      await car.save();
+    } catch (error) {
+      console.error(`Error while updating GPS position: ${error}`);
+      throw new InternalServerErrorException();
+    }
+
+    return car;
   }
 }
