@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialAuthState = {
   isAuthenticated: true,
+  role: "passenger",
 };
 
 const authSlice = createSlice({
@@ -14,6 +15,9 @@ const authSlice = createSlice({
     logout(state) {
       state.isAuthenticated = false;
     },
+    setRole(state, action) {
+      state.role = action.payload
+    }
   },
 });
 

@@ -14,28 +14,28 @@ import { useSelector } from 'react-redux';
 
 function App() {
   const isAuth = useSelector(state => state.auth.isAuthenticated)
+  const role = useSelector(state => state.auth.role)
 	const [isLoading, setIsLoading] = useState(false)
   return (
     <>
+    {isAuth ? 
     <Routes>
-      <Route path="/driver/*" element={isAuth ? 
-        <Routes>
+      {role == "driver" ? 
+        <>
           <Route path='*' element={<Home driver={true}/>}/>
-          <Route path="ride/:id" element={<Map />} />
-          <Route path="/create-ride" element={<CreateRide/>} />
-        </Routes>
-        : 
-        <Auth driver={true}/>
-      }/>
-      <Route path="*" element={isAuth ? 
-        <Routes>
-          <Route path='*' element={<Home />} />
-          <Route path="ride/:id" element={<Map />} />
-        </Routes>
-        :
-        <Auth/>
-      }/>
+          <Route path="driver/ride/:id" element={<Map />} />
+          <Route path="driver/create-ride" element={<CreateRide/>} />
+        </>
+      :
+          <>
+            <Route path='*' element={<Home />} />
+            <Route path="ride/:id" element={<Map />} />
+          </>
+      }
     </Routes>
+    :
+    <Auth/>
+    }
     <ToastContainer />
     <Spinner isLoading={isLoading} message={"loading"}/>
     </>
