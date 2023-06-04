@@ -1,4 +1,4 @@
-import { UseGuards, Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { UseGuards, Controller, Post, Body, Get, Req } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { Car } from './cars.model';
 import { AuthenticatedGuard } from 'src/auth/auth.guard';
@@ -31,8 +31,14 @@ export class CarsController {
     return { id: generatedId };
   }
 
-  @Get(':id')
-  getCar(@Param('id') carId: string) {
-    return this.carsService.getCar(carId);
+  @Post('update-gps')
+  async updateGps(
+    @Req() request,
+    @Body('gps_position')
+    newGpsPosition: { latitude: number; longitude: number },
+  ) {
+    const username = request.session?.passport?.user?.userName;
+    await this.carsService.updateGpsPosition(username, newGpsPosition);
+    return { message: 'GPS position updated successfully' };
   }
 }

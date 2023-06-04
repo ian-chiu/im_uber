@@ -8,12 +8,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Car } from 'src/cars/cars.model';
 import { UsersService } from 'src/users/users.service';
+import { StopsService } from 'src/stops/stops.service';
 
 @Injectable()
 export class CarsService {
   constructor(
     @InjectModel('Car') private readonly carModel: Model<Car>,
     private readonly usersService: UsersService,
+    private readonly stopsService: StopsService,
   ) {}
 
   async insertCar(
@@ -26,6 +28,17 @@ export class CarsService {
 
     if (driver.role !== 'driver') {
       throw new BadRequestException('The driver must have a driver role');
+    }
+
+    // Retrieve all stops from the database
+    const allStops = await this.stopsService.getStops();
+    const allStopNames = new Set(allStops.map((s) => s.name.toLowerCase()));
+
+    // Validate that each stop in the input exists in the database
+    for (const stop of stops) {
+      if (!allStopNames.has(stop.toLowerCase())) {
+        throw new BadRequestException(`Stop '${stop}' does not exist`);
+      }
     }
 
     const newCar = new this.carModel({
