@@ -14,10 +14,10 @@ import axios from '~/app/axios'
 import styles from './style.module.css'
 import Search from './Search'
 import { useState } from 'react';
+import handleError from '~/utils/error';
 
 
 function Home(props) {
-	console.log(props.driver)
 	const [arrival, setArrival] = useState(0)
 	const [departure, setDeparture] = useState(1)
 	const [departureTime, setDepartureTime] = useState(new Date())
@@ -25,7 +25,7 @@ function Home(props) {
 	useEffect(() => {
 		axios.get("/stops").then((res) => {
 			setStops(res.data)
-		})
+		}).catch(handleError)
 	}, [])
 	let searchInput = (
 		<InputGroup>
