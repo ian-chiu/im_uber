@@ -107,11 +107,11 @@ const Map = forwardRef((props, _ref) => {
     }
 
     for (let i = 1; i < stops.length - 1; i++) {
-      if (location.pathname.includes("/driver/ride/")) {
-        if (!passengerStopIds.has(stops[i].id)) {
-          continue;
-        }
-      }
+      // if (location.pathname.includes("/driver/ride/")) {
+      //   if (!passengerStopIds.has(stops[i].id)) {
+      //     continue;
+      //   }
+      // }
       waypointStopIds.push(stops[i].id);
       waypoints.push({
         location: stops[i].position,

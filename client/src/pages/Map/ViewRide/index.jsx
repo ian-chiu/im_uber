@@ -2,7 +2,6 @@ import styles from "./style.module.css";
 import { Card, ListGroup, Tab, Tabs, Button } from "react-bootstrap";
 import { useLocation } from "react-router";
 import { getTimeString, getDateString } from "~/utils/time";
-import { useEffect } from "react";
 
 const ViewRide = (props) => {
   const location = useLocation();
@@ -27,12 +26,12 @@ const ViewRide = (props) => {
     if (ride && ride.status == 1) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Button size="sm" className={styles.joinRideButton}>
-            駕駛完成任務
-          </Button>
+          <Card.Text>
+            駕駛正在路上...
+          </Card.Text>
         </Card.Body>
       );
-    } else {
+    } else if (userInput) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
           <Button size="sm" className={styles.joinRideButton}>
@@ -43,12 +42,22 @@ const ViewRide = (props) => {
           </div>
         </Card.Body>
       );
+    } else {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Card.Text>
+            等待駕駛發車
+          </Card.Text>
+        </Card.Body>
+      );
     }
   } else if (ride && location.pathname.split("/")[1] === "driver") {
     if (ride && ride.status == 1) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Card.Text>任務...</Card.Text>
+          <Button size="sm" className={styles.joinRideButton}>
+            完成共乘
+          </Button>
         </Card.Body>
       );
     } else {
