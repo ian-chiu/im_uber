@@ -5,6 +5,7 @@ import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import SetRoute from "./SetRoute";
 import ViewRide from "./ViewRide";
+import axios from "~/app/axios";
 
 const libraries = ["places"];
 
@@ -120,7 +121,10 @@ const Map = forwardRef((props, _ref) => {
     for (let i = 0; i < result.routes[0].legs.length; i++) {
       updatedArrivalTimes.push({
         stopId: waypointStopIds[i] || stops[stops.length - 1].id,
-        date: addSeconds(updatedArrivalTimes[updatedArrivalTimes.length - 1].date, result.routes[0].legs[i].duration.value),
+        date: addSeconds(
+          updatedArrivalTimes[updatedArrivalTimes.length - 1].date,
+          result.routes[0].legs[i].duration.value
+        ),
       });
     }
     setArrivalTimes(updatedArrivalTimes);
@@ -135,12 +139,9 @@ const Map = forwardRef((props, _ref) => {
   };
 
   useEffect(() => {
-    fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/stops")
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setSpots(data);
+    axios.get("/stops")
+      .then((res) => {
+        setSpots(res.data);
       });
     if (location.pathname.split("/")[1] === "ride" || location.pathname.split("/")[2] === "ride") {
       fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/rides/asdf")
@@ -158,7 +159,7 @@ const Map = forwardRef((props, _ref) => {
           );
           setDepartureTime(new Date(data[0]["departure_time"]));
         });
-    } else if (location.pathname.split[1] === "create-ride") {
+    } else if (location.pathname.includes("/driver/create-ride")) {
       if (props.stops) {
         setStops(props.stops);
       }
