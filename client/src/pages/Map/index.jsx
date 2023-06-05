@@ -1,11 +1,12 @@
 import styles from "./style.module.css";
-import { GoogleMap, useJsApiLoader, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, DirectionsRenderer, MarkerF } from "@react-google-maps/api";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import SetRoute from "./SetRoute";
 import ViewRide from "./ViewRide";
 import axios from "~/app/axios";
+import CarIconPng from "~/assets/images/car.png"
 
 const libraries = ["places"];
 
@@ -22,6 +23,7 @@ const Map = forwardRef((props, _ref) => {
   const [arrivalTimes, setArrivalTimes] = useState([]);
   const [ride, setRide] = useState(null);
   const [driverRevenue, setDriverRevenue] = useState(null);
+  const [driverPosition, setDriverPosition] = useState(null);
 
   let deck = null;
   if (location.pathname.includes("/driver/create-ride")) {
@@ -60,6 +62,16 @@ const Map = forwardRef((props, _ref) => {
         spots={spots}
         arrivalTimes={arrivalTimes}
         driverRevenue={driverRevenue}
+      />
+    );
+  }
+
+  let driverMarker = null;
+  if (driverPosition) {
+    driverMarker = (
+      <MarkerF
+        position={driverPosition.position}
+        icon={CarIconPng}
       />
     );
   }
@@ -207,6 +219,27 @@ const Map = forwardRef((props, _ref) => {
     },
   }));
 
+  useEffect(() => {
+    if (!ride || !ride.status === 1) {
+      return;
+    }
+    const getDriverGeoPosition = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setDriverPosition({
+            position: new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+            timestamp: new Date().getTime(),
+          });
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    }
+    getDriverGeoPosition();
+    setInterval(getDriverGeoPosition, 15000);
+  }, [ride]);
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.goBackButton} onClick={handleGoBack}>
@@ -224,6 +257,7 @@ const Map = forwardRef((props, _ref) => {
             }}
           >
             {directionResponse && <DirectionsRenderer directions={directionResponse} />}
+            {driverMarker}
           </GoogleMap>
         ) : (
           <div>Loading...</div>

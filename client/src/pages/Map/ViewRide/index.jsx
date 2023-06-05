@@ -23,20 +23,47 @@ const ViewRide = (props) => {
 
   let bottomPanel = null;
   if (location.pathname.split("/")[1] === "ride") {
-    bottomPanel = (
-      <Card.Body className={styles.bottomPanel}>
-        <Button size="sm" className={styles.joinRideButton}>
-          加入共乘
-        </Button>
-        <div className={styles.infoTexts}>
-          <div>
-            票價 {userInput.ticketPrice !== null ? ` NTD ${userInput.ticketPrice}` : "loading..."}
+    if (ride && ride.status == 1) {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Card.Text>
+            駕駛正在路上...
+          </Card.Text>
+        </Card.Body>
+      );
+    } else if (userInput) {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Button size="sm" className={styles.joinRideButton}>
+            加入共乘
+          </Button>
+          <div className={styles.infoTexts}>
+            <div>
+              票價 {userInput.ticketPrice !== null ? ` NTD ${userInput.ticketPrice}` : "loading..."}
+            </div>
           </div>
-        </div>
-      </Card.Body>
-    );
+        </Card.Body>
+      )
+    } else {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Card.Text>
+            等待駕駛發車
+          </Card.Text>
+        </Card.Body>
+      );
+    }
   } else if (ride && location.pathname.split("/")[1] === "driver") {
-    bottomPanel = (
+    if (ride && ride.status == 1) {
+      bottomPanel = (
+        <Card.Body className={styles.bottomPanel}>
+          <Button size="sm" className={styles.joinRideButton}>
+            完成共乘
+          </Button>
+        </Card.Body>
+      );
+    } else {
+      bottomPanel = (
       <Card.Body className={styles.bottomPanel}>
         <Button size="sm" className={styles.joinRideButton}>
           發車
@@ -45,7 +72,8 @@ const ViewRide = (props) => {
           <div>收入{driverRevenue !== null ? ` NTD ${driverRevenue}` : "loading..."}</div>
         </div>
       </Card.Body>
-    );
+      );
+    }
   }
 
   let stopListGroupItems = [];
