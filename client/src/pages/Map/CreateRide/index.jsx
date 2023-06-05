@@ -67,7 +67,6 @@ const CreateRide = () => {
     ) {
       axios
         .post("/cars", {
-          driver_name: "test1",
           departure_time: values.departureTime.toISOString(),
           stops: stops.map((stop) => stop.name),
           stops_eta: arrivalTimes.map((arrivalTime) => arrivalTime.date.toISOString()),
