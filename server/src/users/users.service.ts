@@ -53,4 +53,15 @@ export class UsersService {
     }
     return { username: updatedUser.username, role: updatedUser.role };
   }
+
+  async getUsernames() {
+    const users = await this.userModel.find({}, { username: 1 });
+    return users;
+  }
+
+  async getUsers() {
+    // get all users with username and role
+    const users = await this.userModel.find({}, { username: 1, role: 1 });
+    return users;
+  }
 }

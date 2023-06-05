@@ -60,4 +60,31 @@ export class UsersController {
       },
     };
   }
+
+  @Get('name')
+  async getUsername(@Req() request): Promise<any> {
+    const username = request.session?.passport?.user?.userName;
+    if (!username) {
+      throw new BadRequestException('No user is currently logged in');
+    }
+    return username;
+  }
+
+  @Get('names')
+  async getUsernames(): Promise<any> {
+    const usernames = await this.usersService.getUsernames();
+    if (!usernames) {
+      throw new BadRequestException('No Users exist');
+    }
+    return usernames;
+  }
+
+  @Get()
+  async getUsers(): Promise<any> {
+    const users = await this.usersService.getUsers();
+    if (!users) {
+      throw new BadRequestException('No Users exist');
+    }
+    return users;
+  }
 }
