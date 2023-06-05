@@ -1,10 +1,11 @@
 import styles from "./style.module.css";
-import { GoogleMap, useJsApiLoader, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, DirectionsRenderer, MarkerF } from "@react-google-maps/api";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import SetRoute from "./SetRoute";
 import ViewRide from "./ViewRide";
+import CarIconPng from "~/assets/images/car.png"
 
 const libraries = ["places"];
 
@@ -20,6 +21,7 @@ const Map = forwardRef((props, _ref) => {
   const [stops, setStops] = useState([]);
   const [arrivalTimes, setArrivalTimes] = useState([]);
   const [ride, setRide] = useState(null);
+  const [driverPosition, setDriverPosition] = useState(null);
 
   let deck = null;
   if (location.pathname.includes("/driver/create-ride")) {
@@ -50,7 +52,24 @@ const Map = forwardRef((props, _ref) => {
       />
     );
   } else if (location.pathname.includes("/driver/ride/")) {
-    deck = <ViewRide ride={ride} stops={stops} spots={spots} arrivalTimes={arrivalTimes} />;
+    deck = (
+      <ViewRide
+        ride={ride}
+        stops={stops}
+        spots={spots}
+        arrivalTimes={arrivalTimes}
+      />
+    );
+  }
+
+  let driverMarker = null;
+  if (driverPosition) {
+    driverMarker = (
+      <MarkerF
+        position={driverPosition.position}
+        icon={CarIconPng}
+      />
+    );
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -88,11 +107,11 @@ const Map = forwardRef((props, _ref) => {
     }
 
     for (let i = 1; i < stops.length - 1; i++) {
-      if (location.pathname.includes("/driver/ride/")) {
-        if (!passengerStopIds.has(stops[i].id)) {
-          continue;
-        }
-      }
+      // if (location.pathname.includes("/driver/ride/")) {
+      //   if (!passengerStopIds.has(stops[i].id)) {
+      //     continue;
+      //   }
+      // }
       waypointStopIds.push(stops[i].id);
       waypoints.push({
         location: stops[i].position,
@@ -120,7 +139,10 @@ const Map = forwardRef((props, _ref) => {
     for (let i = 0; i < result.routes[0].legs.length; i++) {
       updatedArrivalTimes.push({
         stopId: waypointStopIds[i] || stops[stops.length - 1].id,
-        date: addSeconds(updatedArrivalTimes[updatedArrivalTimes.length - 1].date, result.routes[0].legs[i].duration.value),
+        date: addSeconds(
+          updatedArrivalTimes[updatedArrivalTimes.length - 1].date,
+          result.routes[0].legs[i].duration.value
+        ),
       });
     }
     setArrivalTimes(updatedArrivalTimes);
@@ -148,6 +170,7 @@ const Map = forwardRef((props, _ref) => {
           return response.json();
         })
         .then((data) => {
+          data[0].status = 1;
           setRide(data[0]);
           setStops(
             data[0].stops.map((stop) => ({
@@ -192,6 +215,27 @@ const Map = forwardRef((props, _ref) => {
     },
   }));
 
+  useEffect(() => {
+    if (!ride || !ride.status === 1) {
+      return;
+    }
+    const getDriverGeoPosition = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setDriverPosition({
+            position: new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+            timestamp: new Date().getTime(),
+          });
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    }
+    getDriverGeoPosition();
+    setInterval(getDriverGeoPosition, 15000);
+  }, [ride]);
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.goBackButton} onClick={handleGoBack}>
@@ -209,6 +253,7 @@ const Map = forwardRef((props, _ref) => {
             }}
           >
             {directionResponse && <DirectionsRenderer directions={directionResponse} />}
+            {driverMarker}
           </GoogleMap>
         ) : (
           <div>Loading...</div>
