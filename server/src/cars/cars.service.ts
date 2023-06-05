@@ -172,7 +172,7 @@ export class CarsService {
   ): Promise<Car[]> {
     const cars = await this.getCars();
 
-    return cars.filter((car) => {
+    const filteredCars = cars.filter((car) => {
       if (driverUsername) {
         if (car.driver !== driverUsername) {
           return false;
@@ -221,6 +221,19 @@ export class CarsService {
 
       return true;
     });
+
+    let CarsWithTickets = [];
+
+    for (const car of filteredCars) {
+      const tickets = await this.ticketsService.getTicketsByCarId(car._id);
+      const newCar = {
+        ...car.toObject(),
+        tickets: tickets,
+      };
+      CarsWithTickets.push(newCar);
+    }
+
+    return CarsWithTickets;
   }
 
   async getCarById(id: string): Promise<Car> {
