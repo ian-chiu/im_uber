@@ -1,4 +1,5 @@
 import {
+  forwardRef,
   Inject,
   Injectable,
   ConflictException,
@@ -10,6 +11,7 @@ import { Model } from 'mongoose';
 import { Car } from 'src/cars/cars.model';
 import { UsersService } from 'src/users/users.service';
 import { StopsService } from 'src/stops/stops.service';
+import { TicketsService } from 'src/tickets/tickets.service';
 
 @Injectable()
 export class CarsService {
@@ -17,6 +19,8 @@ export class CarsService {
     @InjectModel('Car') private readonly carModel: Model<Car>,
     private readonly usersService: UsersService,
     private readonly stopsService: StopsService,
+    @Inject(forwardRef(() => TicketsService))
+    private readonly ticketsService: TicketsService,
     @Inject('GoogleMapsService') private googleMapsClient,
   ) {}
 
@@ -248,5 +252,10 @@ export class CarsService {
       throw new BadRequestException(`Car for ID ${carId} not found`);
     }
     return car.gps_position;
+  }
+
+  async getCarRevenue(carId: string) {
+    const totalPrice = await this.ticketsService.calculateTotalPrice(carId);
+    return totalPrice;
   }
 }

@@ -1,4 +1,6 @@
 import {
+  Inject,
+  forwardRef,
   Injectable,
   BadRequestException,
   NotFoundException,
@@ -14,6 +16,7 @@ export class TicketsService {
   constructor(
     @InjectModel('Ticket') private readonly ticketModel: Model<Ticket>,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => CarsService))
     private readonly carsService: CarsService,
   ) {}
 
@@ -92,7 +95,7 @@ export class TicketsService {
     return { message: 'Ticket deleted successfully' };
   }
 
-  async getTickets(passengerUsername: string) {
+  async getTicketsByPassenger(passengerUsername: string) {
     const tickets = await this.ticketModel.find({
       passenger: passengerUsername,
     });
@@ -121,5 +124,29 @@ export class TicketsService {
     );
 
     return updatedTickets;
+  }
+
+  async getTicketsByCarId(carId: string) {
+    const tickets = await this.ticketModel.find({
+      car_id: carId,
+    });
+    if (!tickets) {
+      throw new BadRequestException('No tickets found');
+    }
+    return tickets;
+  }
+
+  async calculateTotalPrice(carId: string) {
+    const tickets = await this.ticketModel.find({
+      car_id: carId,
+    });
+    if (!tickets) {
+      throw new BadRequestException('No tickets found');
+    }
+    let totalPrice = 0;
+    tickets.forEach((ticket) => {
+      totalPrice += ticket.price;
+    });
+    return totalPrice;
   }
 }

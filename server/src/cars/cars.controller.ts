@@ -86,4 +86,10 @@ export class CarsController {
     const gpsPosition = await this.carsService.getCarGPSPosition(carId);
     return { car_id: carId, gps_position: gpsPosition };
   }
+
+  @Get(':id/revenue')
+  async getCarRevenue(@Param('id') carId: string) {
+    const revenue = await this.carsService.getCarRevenue(carId);
+    return { revenue: revenue };
+  }
 }

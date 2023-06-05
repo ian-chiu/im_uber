@@ -6,7 +6,6 @@ export const TicketSchema = new mongoose.Schema(
       type: String,
       ref: 'User',
       required: true,
-      unique: true,
     },
     car_id: {
       type: String,

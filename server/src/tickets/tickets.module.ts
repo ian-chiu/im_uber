@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TicketsService } from 'src/tickets/tickets.service';
 import { TicketSchema } from 'src/tickets/tickets.model';
@@ -10,7 +10,7 @@ import { TicketsController } from './tickets.controller';
   imports: [
     MongooseModule.forFeature([{ name: 'Ticket', schema: TicketSchema }]),
     UsersModule,
-    CarsModule,
+    forwardRef(() => CarsModule),
   ],
   providers: [TicketsService],
   exports: [TicketsService],

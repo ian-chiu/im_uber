@@ -36,7 +36,9 @@ export class TicketsController {
   @Get()
   async getTicket(@Req() request) {
     const passengerUsername = request.session?.passport?.user?.userName;
-    const result = await this.ticketsService.getTickets(passengerUsername);
+    const result = await this.ticketsService.getTicketsByPassenger(
+      passengerUsername,
+    );
     return result;
   }
 }
