@@ -9,7 +9,7 @@ export const CarSchema = new mongoose.Schema({
   driver: { type: String, required: true },
   departure_time: { type: Date, required: true },
   stops: [stopSchema],
-  license_plate: { type: String, required: true, unique: true },
+  license_plate: { type: String, required: true },
   passengers: [String],
   gps_position: {
     latitude: { type: Number, default: null },

@@ -22,12 +22,14 @@ export class CarsController {
     @Query('start_stop') startStop?: string,
     @Query('dest_stop') destStop?: string,
     @Query('start_time') startTime?: Date,
+    @Query('driver') driver?: string,
   ): Promise<Car[]> {
     // The filtering logic should be done in the service
     const cars = await this.carsService.getFilteredCars(
       startStop,
       destStop,
       startTime,
+      driver,
     );
     return cars;
   }

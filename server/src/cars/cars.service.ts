@@ -64,7 +64,7 @@ export class CarsService {
       return newCar;
     } catch (error) {
       if (error.code === 11000) {
-        throw new ConflictException('License plate already exists');
+        throw new ConflictException('Something conflict');
       }
       throw new InternalServerErrorException();
     }
@@ -164,10 +164,17 @@ export class CarsService {
     startStopName?: string,
     destStopName?: string,
     startTime?: Date,
+    driverUsername?: string,
   ): Promise<Car[]> {
     const cars = await this.getCars();
 
     return cars.filter((car) => {
+      if (driverUsername) {
+        if (car.driver !== driverUsername) {
+          return false;
+        }
+      }
+
       let startStopIndex = -1;
       let destStopIndex = -1;
 
