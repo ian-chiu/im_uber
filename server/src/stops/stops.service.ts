@@ -36,6 +36,11 @@ export class StopsService {
     return stops;
   }
 
+  async getStopByName(stopName: string) {
+    const stop = await this.stopModel.findOne({ name: stopName });
+    return stop;
+  }
+
   getStops_dev(): any {
     return [
       {
