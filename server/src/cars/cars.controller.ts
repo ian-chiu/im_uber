@@ -1,4 +1,5 @@
 import {
+  Param,
   Query,
   UseGuards,
   Controller,
@@ -76,5 +77,11 @@ export class CarsController {
     @Body('status') status: number,
   ) {
     return this.carsService.updateCarStatus(carId, status);
+  }
+
+  @Get(':id/gps')
+  async getCarGPSPosition(@Param('id') carId: string) {
+    const gpsPosition = await this.carsService.getCarGPSPosition(carId);
+    return { car_id: carId,gps_position: gpsPosition };
   }
 }

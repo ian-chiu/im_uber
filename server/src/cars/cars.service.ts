@@ -232,4 +232,12 @@ export class CarsService {
     await car.save();
     return car;
   }
+
+  async getCarGPSPosition(carId: string) {
+    const car = await this.getCarById(carId);
+    if (!car) {
+      throw new BadRequestException(`Car for ID ${carId} not found`);
+    }
+    return car.gps_position;
+  }
 }
