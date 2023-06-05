@@ -38,7 +38,6 @@ export class CarsController {
     @Body('stops') carStops: string[],
     @Body('license_plate') carLicensePlate: string,
   ) {
-    console.log(carDriver, carDepartureTime, carStops, carLicensePlate);
     const generatedId = await this.carsService.insertCar(
       carDriver,
       carDepartureTime,

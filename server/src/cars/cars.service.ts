@@ -65,7 +65,6 @@ export class CarsService {
       if (error.code === 11000) {
         throw new ConflictException('License plate already exists');
       }
-      console.log(error.code);
       throw new InternalServerErrorException();
     }
   }
@@ -119,8 +118,6 @@ export class CarsService {
       return stopDetail.location.coordinates.reverse();
     });
 
-    console.log(destinations);
-
     this.googleMapsClient
       .distancematrix({
         params: {
@@ -133,7 +130,6 @@ export class CarsService {
       })
       .then((result) => {
         if (result.status === 200) {
-          console.log(result);
           const elements = result.data.rows[0].elements;
           for (let i = 0; i < elements.length; i++) {
             const element = elements[i];
@@ -164,7 +160,6 @@ export class CarsService {
     destStopName?: string,
     startTime?: Date,
   ): Promise<Car[]> {
-    console.log(startStopName, destStopName, startTime);
     const cars = await this.getCars();
 
     return cars.filter((car) => {
@@ -183,31 +178,26 @@ export class CarsService {
       if (startStopName) {
         // The car has not passed the start stop or dest stop
         if (startStopIndex === -1) {
-          console.log('no start stop');
           return false;
         }
       }
       if (destStopName) {
         if (destStopIndex === -1) {
-          console.log('no dest stop');
           return false;
         }
       }
       // The car's ETA is not too late compared to the passenger's start time
       if (startTime) {
-        console.log('200');
         const passengerStartTime = new Date(startTime);
         if (startStopName && startStopIndex !== -1) {
           const carStartTime = new Date(car.stops[startStopIndex].eta);
           if (carStartTime < passengerStartTime) {
-            console.log('205');
             return false;
           }
         }
         if (destStopName && destStopIndex !== -1) {
           const carDestTime = new Date(car.stops[destStopIndex].eta);
           if (carDestTime < passengerStartTime) {
-            console.log('212');
             return false;
           }
         }
