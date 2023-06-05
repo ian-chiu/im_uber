@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get,Post, Body, Req, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { AuthenticatedGuard } from 'src/auth/auth.guard';
 
@@ -30,6 +30,13 @@ export class TicketsController {
   async destroyTicket(@Req() request) {
     const passengerUsername = request.session?.passport?.user?.userName;
     const result = await this.ticketsService.destroyTicket(passengerUsername);
+    return result;
+  }
+
+  @Get()
+  async getTicket(@Req() request) {
+    const passengerUsername = request.session?.passport?.user?.userName;
+    const result = await this.ticketsService.getTickets(passengerUsername);
     return result;
   }
 }

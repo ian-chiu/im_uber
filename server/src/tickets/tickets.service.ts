@@ -91,4 +91,28 @@ export class TicketsService {
 
     return { message: 'Ticket deleted successfully' };
   }
+
+  async getTickets(passengerUsername: string,) {
+    const tickets = await this.ticketModel.find({ passenger: passengerUsername });
+
+    const updatedTickets = await Promise.all(tickets.map(async (ticket) => {
+      const car = await this.carsService.getCarById(ticket.car_id);
+      const departureStop = car.stops.find((e) => e.stopName === ticket.boardingStop);
+      const arrivalStop = car.stops.find((e) => e.stopName === ticket.destinationStop);
+
+      if (!departureStop || !arrivalStop) {
+        throw new Error('Stop not found');
+      }
+
+      return {
+        ...ticket.toObject(),
+        departure_time: departureStop.eta,
+        arrival_time: arrivalStop.eta,
+        ride: car,
+      };
+    }));
+
+    return updatedTickets;
+  }
+
 }
