@@ -67,7 +67,7 @@ export class UsersController {
     if (!username) {
       throw new BadRequestException('No user is currently logged in');
     }
-    return username;
+    return { username };
   }
 
   @Get('names')
