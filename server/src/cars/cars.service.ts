@@ -90,12 +90,14 @@ export class CarsService {
     const cars = await this.getCarsByDriver(driverUsername);
 
     for (const car of cars) {
-      car.gps_position = newGpsPosition;
-      try {
-        await car.save();
-      } catch (error) {
-        console.error(`Error while updating GPS position: ${error}`);
-        throw new InternalServerErrorException();
+      if (car.status === 1) {
+        car.gps_position = newGpsPosition;
+        try {
+          await car.save();
+        } catch (error) {
+          console.error(`Error while updating GPS position: ${error}`);
+          throw new InternalServerErrorException();
+        }
       }
     }
 
