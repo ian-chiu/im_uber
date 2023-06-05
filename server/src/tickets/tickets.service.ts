@@ -103,7 +103,9 @@ export class TicketsService {
     const updatedTickets = await Promise.all(
       tickets.map(async (ticket) => {
         const car = await this.carsService.getCarById(ticket.car_id);
-        const passengerPhone = (await this.usersService.getUser(passengerUsername)).phone;
+        const passengerPhone = (
+          await this.usersService.getUser(passengerUsername)
+        ).phone;
         const departureStop = car.stops.find(
           (e) => e.stopName === ticket.boardingStop,
         );
@@ -138,10 +140,12 @@ export class TicketsService {
 
     const updatedTickets = await Promise.all(
       tickets.map(async (ticket) => {
-        const passenget_phone = (await this.usersService.getUser(ticket.passenger)).phone;
+        const passenger_phone = (
+          await this.usersService.getUser(ticket.passenger)
+        ).phone;
         return {
           ...ticket.toObject(),
-          passenget_phone: passenget_phone,
+          passenger_phone: passenger_phone,
         };
       }),
     );

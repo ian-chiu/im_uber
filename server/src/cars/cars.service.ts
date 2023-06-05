@@ -222,7 +222,7 @@ export class CarsService {
       return true;
     });
 
-    let CarsWithTickets = [];
+    const CarsWithTickets = [];
 
     for (const car of filteredCars) {
       const tickets = await this.ticketsService.getTicketsByCarId(car._id);
