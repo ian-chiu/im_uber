@@ -1,9 +1,14 @@
 import * as mongoose from 'mongoose';
 
+const stopSchema = new mongoose.Schema({
+  stopName: { type: String, required: true },
+  eta: { type: Date, default: null },
+});
+
 export const CarSchema = new mongoose.Schema({
   driver: { type: String, required: true },
   departure_time: { type: Date, required: true },
-  stops: [{ type: String, required: true }],
+  stops: [stopSchema],
   license_plate: { type: String, required: true, unique: true },
   passengers: [String],
   gps_position: {
@@ -15,7 +20,7 @@ export const CarSchema = new mongoose.Schema({
 export interface Car extends mongoose.Document {
   driver: string;
   departure_time: Date;
-  stops: string[];
+  stops: { stopName: string; eta: Date | null }[];
   license_plate: string;
   passengers: string[];
   gps_position: { latitude: number; longitude: number };
