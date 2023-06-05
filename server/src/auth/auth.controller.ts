@@ -21,12 +21,17 @@ export class AuthController {
   async addUser(
     @Body('password') userPassword: string,
     @Body('username') userName: string,
+    @Body('phone') userPhone: number,
   ) {
     //hash password
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(userPassword, saltOrRounds);
 
-    const result = await this.usersService.insertUser(userName, hashedPassword);
+    const result = await this.usersService.insertUser(
+      userName,
+      hashedPassword,
+      userPhone,
+    );
     return {
       msg: 'User successfully registered',
       userId: result.id,
