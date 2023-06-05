@@ -226,8 +226,10 @@ export class CarsService {
 
     for (const car of filteredCars) {
       const tickets = await this.ticketsService.getTicketsByCarId(car._id);
+      const driver_phone = (await this.usersService.getUser(car.driver)).phone;
       const newCar = {
         ...car.toObject(),
+        driver_phone: driver_phone,
         tickets: tickets,
       };
       CarsWithTickets.push(newCar);
