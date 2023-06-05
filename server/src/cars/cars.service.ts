@@ -271,4 +271,15 @@ export class CarsService {
     const totalPrice = await this.ticketsService.calculateTotalPrice(carId);
     return totalPrice;
   }
+
+  async getCarInfoById(carId: string) {
+    const car = await this.getCarById(carId);
+    const driver_phone = (await this.usersService.getUser(car.driver)).phone;
+    const tickets = await this.ticketsService.getTicketsByCarId(carId);
+    return {
+      ...car.toObject(),
+      driver_phone: driver_phone,
+      tickets: tickets,
+    };
+  }
 }

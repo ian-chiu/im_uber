@@ -81,6 +81,12 @@ export class CarsController {
     return this.carsService.updateCarStatus(carId, status);
   }
 
+  @Get(':id')
+  async getCarInfoById(@Param('id') carId: string) {
+    const carInfo = await this.carsService.getCarInfoById(carId);
+    return carInfo;
+  }
+
   @Get(':id/gps')
   async getCarGPSPosition(@Param('id') carId: string) {
     const gpsPosition = await this.carsService.getCarGPSPosition(carId);

@@ -103,6 +103,7 @@ export class TicketsService {
     const updatedTickets = await Promise.all(
       tickets.map(async (ticket) => {
         const car = await this.carsService.getCarById(ticket.car_id);
+        const passengerPhone = (await this.usersService.getUser(passengerUsername)).phone;
         const departureStop = car.stops.find(
           (e) => e.stopName === ticket.boardingStop,
         );
@@ -116,6 +117,7 @@ export class TicketsService {
 
         return {
           ...ticket.toObject(),
+          passenger_phone: passengerPhone,
           departure_time: departureStop.eta,
           arrival_time: arrivalStop.eta,
           ride: car,
@@ -133,7 +135,18 @@ export class TicketsService {
     if (!tickets) {
       throw new BadRequestException('No tickets found');
     }
-    return tickets;
+
+    const updatedTickets = await Promise.all(
+      tickets.map(async (ticket) => {
+        const passenget_phone = (await this.usersService.getUser(ticket.passenger)).phone;
+        return {
+          ...ticket.toObject(),
+          passenget_phone: passenget_phone,
+        };
+      }),
+    );
+
+    return updatedTickets;
   }
 
   async calculateTotalPrice(carId: string) {

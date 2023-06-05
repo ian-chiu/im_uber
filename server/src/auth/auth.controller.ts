@@ -21,7 +21,7 @@ export class AuthController {
   async addUser(
     @Body('password') userPassword: string,
     @Body('username') userName: string,
-    @Body('phone') userPhone: number,
+    @Body('phone') userPhone: string,
   ) {
     //hash password
     const saltOrRounds = 10;

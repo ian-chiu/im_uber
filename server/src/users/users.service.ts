@@ -13,7 +13,7 @@ export class UsersService {
   constructor(@InjectModel('user') private readonly userModel: Model<User>) {}
 
   //Signup user method with username and password
-  async insertUser(username: string, password: string, phone: number) {
+  async insertUser(username: string, password: string, phone: string) {
     const newUser = new this.userModel({
       username,
       password,

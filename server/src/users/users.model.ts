@@ -18,7 +18,7 @@ export const UserSchema = new mongoose.Schema(
       default: 'passenger', // default role is 'passenger'
     },
     phone: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
