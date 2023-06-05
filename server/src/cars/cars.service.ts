@@ -24,7 +24,9 @@ export class CarsService {
     driverUsername: string,
     departureTime: Date,
     stopNames: string[],
+    stopETAs: Date[],
     licensePlate: string,
+    seats: number,
   ) {
     const driver = await this.usersService.getUser(driverUsername);
 
@@ -43,23 +45,22 @@ export class CarsService {
       }
     }
 
-    // Construct the stops with default eta as null
-    const stops = stopNames.map((name) => ({ stopName: name, eta: null }));
+    // Construct the stops with eta as provided
+    const stops = stopNames.map((name, index) => ({
+      stopName: name,
+      eta: stopETAs[index],
+    }));
 
     const newCar = new this.carModel({
       driver: driverUsername,
       departure_time: departureTime,
       stops,
       license_plate: licensePlate,
+      seats,
     });
 
     try {
       await newCar.save();
-
-      // After successful save, setup the timer
-      // const delay = departureTime.getTime() - new Date().getTime();
-      // setTimeout(() => this.calculateAndSaveETAs(driverUsername), delay);
-
       return newCar;
     } catch (error) {
       if (error.code === 11000) {
@@ -135,9 +136,9 @@ export class CarsService {
             const element = elements[i];
             if (element.status === 'OK') {
               const duration = element.duration.value;
-              const currentEta = new Date();
-              currentEta.setSeconds(currentEta.getSeconds() + duration);
-              car.stops[i].eta = currentEta;
+              const currentETA = new Date();
+              currentETA.setSeconds(currentETA.getSeconds() + duration);
+              car.stops[i].eta = currentETA;
             }
           }
           car.save();
@@ -205,5 +206,13 @@ export class CarsService {
 
       return true;
     });
+  }
+
+  async getCarById(id: string): Promise<Car> {
+    const car = await this.carModel.findById(id).exec();
+    if (!car) {
+      throw new BadRequestException('No car found with the given ID');
+    }
+    return car;
   }
 }

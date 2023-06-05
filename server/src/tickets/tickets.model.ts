@@ -9,9 +9,9 @@ export const TicketSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    driver: {
+    car_id: {
       type: String,
-      ref: 'User',
+      ref: 'Car',
       required: true,
     },
     boardingStop: {
@@ -32,7 +32,7 @@ export const TicketSchema = new mongoose.Schema(
 
 export interface Ticket extends mongoose.Document {
   passenger: string;
-  driver: string;
+  car_id: string;
   boardingStop: string;
   destinationStop: string;
   price: number;

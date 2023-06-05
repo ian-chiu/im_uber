@@ -19,10 +19,9 @@ export class TicketsService {
 
   async createTicket(
     passengerUsername: string,
-    driverUsername: string,
+    carId: string,
     boardingStop: string,
     destinationStop: string,
-    price: number,
   ) {
     const passenger = await this.usersService.getUser(passengerUsername);
 
@@ -30,21 +29,33 @@ export class TicketsService {
       throw new BadRequestException('Invalid roles for passenger or driver');
     }
 
-    const car = await this.carsService.getCarByDriver(driverUsername);
+    const car = await this.carsService.getCarById(carId);
 
     if (!car) {
       throw new BadRequestException(
-        'The driver does not have an associated car',
+        'The car does not exist or has been deleted',
       );
     }
 
-    if (car.passengers && car.passengers.length >= 3) {
+    if (car.passengers && car.passengers.length >= car.seats) {
       throw new BadRequestException('The car is full');
     }
 
+    if (car.passengers.includes(passengerUsername)) {
+      throw new BadRequestException('The passenger is already in the car');
+    }
+
+    const boardingETA = car.stops.find((e) => e.stopName === boardingStop).eta;
+    const destinationETA = car.stops.find(
+      (e) => e.stopName === destinationStop,
+    ).eta;
+    const price = Math.floor(
+      (destinationETA.getTime() - boardingETA.getTime()) / (1000 * 60),
+    );
+
     const newTicket = new this.ticketModel({
       passenger: passengerUsername,
-      driver: driverUsername,
+      car_id: carId,
       boardingStop,
       destinationStop,
       price,
@@ -67,9 +78,9 @@ export class TicketsService {
       throw new NotFoundException(`Ticket for ${passengerUsername} not found`);
     }
 
-    const car = await this.carsService.getCarByDriver(ticket.driver);
+    const car = await this.carsService.getCarByDriver(ticket.car_id);
     if (!car) {
-      throw new NotFoundException(`Car for driver ${ticket.driver} not found`);
+      throw new NotFoundException(`Car for ID ${ticket.car_id} not found`);
     }
 
     car.passengers = car.passengers.filter(

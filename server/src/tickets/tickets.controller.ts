@@ -10,19 +10,17 @@ export class TicketsController {
   @Post('create')
   async createTicket(
     @Req() request,
-    @Body('driverUsername') driverUsername: string,
+    @Body('car_id') carId: string,
     @Body('boardingStop') boardingStop: string,
     @Body('destinationStop') destinationStop: string,
-    @Body('price') price: number,
   ) {
     const passengerUsername = request.session?.passport?.user?.userName;
 
     const newTicket = await this.ticketsService.createTicket(
       passengerUsername,
-      driverUsername,
+      carId,
       boardingStop,
       destinationStop,
-      price,
     );
 
     return newTicket;

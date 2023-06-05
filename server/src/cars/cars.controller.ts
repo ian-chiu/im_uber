@@ -33,16 +33,20 @@ export class CarsController {
 
   @Post()
   async addCar(
-    @Body('driver') carDriver: string,
+    @Body('driver_name') carDriver: string,
     @Body('departure_time') carDepartureTime: Date,
     @Body('stops') carStops: string[],
+    @Body('stops_eta') carStopsETA: Date[],
     @Body('license_plate') carLicensePlate: string,
+    @Body('seats') carSeats: number,
   ) {
     const generatedId = await this.carsService.insertCar(
       carDriver,
       carDepartureTime,
       carStops,
+      carStopsETA,
       carLicensePlate,
+      carSeats,
     );
     return { id: generatedId };
   }
