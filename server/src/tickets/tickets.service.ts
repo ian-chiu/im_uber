@@ -78,7 +78,7 @@ export class TicketsService {
       throw new NotFoundException(`Ticket for ${passengerUsername} not found`);
     }
 
-    const car = await this.carsService.getCarByDriver(ticket.car_id);
+    const car = await this.carsService.getCarById(ticket.car_id);
     if (!car) {
       throw new NotFoundException(`Car for ID ${ticket.car_id} not found`);
     }

@@ -16,6 +16,7 @@ export const CarSchema = new mongoose.Schema({
     longitude: { type: Number, default: null },
   },
   seats: { type: Number, required: true },
+  status: { type: Number, default: 0 },
 });
 
 export interface Car extends mongoose.Document {
@@ -26,4 +27,5 @@ export interface Car extends mongoose.Document {
   passengers: string[];
   gps_position: { latitude: number; longitude: number };
   seats: number;
+  status: number;
 }

@@ -75,29 +75,31 @@ export class CarsService {
     return cars;
   }
 
-  async getCarByDriver(driverUsername: string): Promise<Car> {
-    const car = await this.carModel.findOne({ driver: driverUsername }).exec();
-    if (!car) {
+  async getCarsByDriver(driverUsername: string): Promise<Car[]> {
+    const cars = await this.carModel.find({ driver: driverUsername }).exec();
+    if (!cars) {
       throw new BadRequestException('No car found for the given driver');
     }
-    return car;
+    return cars;
   }
 
   async updateGpsPosition(
     driverUsername: string,
     newGpsPosition: { latitude: number; longitude: number },
   ) {
-    const car = await this.getCarByDriver(driverUsername);
-    car.gps_position = newGpsPosition;
+    const cars = await this.getCarsByDriver(driverUsername);
 
-    try {
-      await car.save();
-    } catch (error) {
-      console.error(`Error while updating GPS position: ${error}`);
-      throw new InternalServerErrorException();
+    for (const car of cars) {
+      car.gps_position = newGpsPosition;
+      try {
+        await car.save();
+      } catch (error) {
+        console.error(`Error while updating GPS position: ${error}`);
+        throw new InternalServerErrorException();
+      }
     }
 
-    return car;
+    return cars;
   }
 
   async calculateETAs(car: Car) {
@@ -151,8 +153,8 @@ export class CarsService {
       });
   }
 
-  async calculateAndSaveETAs(driverUsername: string) {
-    const car = await this.getCarByDriver(driverUsername);
+  async calculateAndSaveETAs(carId: string) {
+    const car = await this.getCarById(carId);
     await this.calculateETAs(car);
   }
 
@@ -213,6 +215,21 @@ export class CarsService {
     if (!car) {
       throw new BadRequestException('No car found with the given ID');
     }
+    return car;
+  }
+
+  async updateCarStatus(carId: string, status: number) {
+    if (![0, 1, 2].includes(status)) {
+      throw new BadRequestException(
+        'Invalid status. It must be either 0, 1 or 2',
+      );
+    }
+    const car = await this.getCarById(carId);
+    if (!car) {
+      throw new BadRequestException(`Car for ID ${carId} not found`);
+    }
+    car.status = status;
+    await car.save();
     return car;
   }
 }

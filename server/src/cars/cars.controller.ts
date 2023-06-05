@@ -33,15 +33,16 @@ export class CarsController {
 
   @Post()
   async addCar(
-    @Body('driver_name') carDriver: string,
+    @Req() request,
     @Body('departure_time') carDepartureTime: Date,
     @Body('stops') carStops: string[],
     @Body('stops_eta') carStopsETA: Date[],
     @Body('license_plate') carLicensePlate: string,
     @Body('seats') carSeats: number,
   ) {
+    const driverUsername = request.session?.passport?.user?.userName;
     const generatedId = await this.carsService.insertCar(
-      carDriver,
+      driverUsername,
       carDepartureTime,
       carStops,
       carStopsETA,
@@ -62,11 +63,18 @@ export class CarsController {
     return { message: 'GPS position updated successfully' };
   }
 
-  // cars.controller.ts
   @Get('eta')
   async calculateETAs(@Req() request) {
     const username = request.session?.passport?.user?.userName;
     await this.carsService.calculateAndSaveETAs(username);
     return { message: 'ETAs calculated and saved successfully' };
+  }
+
+  @Post('status')
+  async updateCarStatus(
+    @Body('car_id') carId: string,
+    @Body('status') status: number,
+  ) {
+    return this.carsService.updateCarStatus(carId, status);
   }
 }
