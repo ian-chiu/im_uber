@@ -26,7 +26,7 @@ export class TicketsService {
     boardingStop: string,
     destinationStop: string,
   ) {
-    const passenger = await this.usersService.getUser(passengerUsername);
+    const passenger = await this.usersService.getUserByName(passengerUsername);
 
     if (passenger.role !== 'passenger') {
       throw new BadRequestException('Invalid roles for passenger or driver');
@@ -104,7 +104,7 @@ export class TicketsService {
       tickets.map(async (ticket) => {
         const car = await this.carsService.getCarById(ticket.car_id);
         const passengerPhone = (
-          await this.usersService.getUser(passengerUsername)
+          await this.usersService.getUserByName(passengerUsername)
         ).phone;
         const departureStop = car.stops.find(
           (e) => e.stopName === ticket.boardingStop,
@@ -141,7 +141,7 @@ export class TicketsService {
     const updatedTickets = await Promise.all(
       tickets.map(async (ticket) => {
         const passenger_phone = (
-          await this.usersService.getUser(ticket.passenger)
+          await this.usersService.getUserByName(ticket.passenger)
         ).phone;
         return {
           ...ticket.toObject(),

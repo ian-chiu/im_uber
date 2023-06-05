@@ -20,6 +20,7 @@ export const CarSchema = new mongoose.Schema({
 });
 
 export interface Car extends mongoose.Document {
+  _id: string;
   driver: string;
   departure_time: Date;
   stops: { stopName: string; eta: Date | null }[];

@@ -23,7 +23,7 @@ export class UsersController {
       throw new NotFoundException('No user is currently logged in');
     }
 
-    const user = await this.usersService.getUser(username);
+    const user = await this.usersService.getUserByName(username);
     if (!user) {
       throw new NotFoundException(`User ${username} not found`);
     }
@@ -41,7 +41,7 @@ export class UsersController {
       throw new BadRequestException('No user is currently logged in');
     }
 
-    const currentUser = await this.usersService.getUser(username);
+    const currentUser = await this.usersService.getUserByName(username);
     if (!currentUser) {
       throw new BadRequestException(`User ${username} not found`);
     }
