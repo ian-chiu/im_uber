@@ -1,13 +1,16 @@
 import styles from "./style.module.css";
 import { Card, ListGroup, Tab, Tabs, Button } from "react-bootstrap";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { getTimeString, getDateString } from "~/utils/time";
 import axios from "~/app/axios";
 import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
 
 const ViewRide = (props) => {
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { stops, ride, setRideStatus, userInput, arrivalTimes, driverRevenue } = props;
 
   const userInputStopIndex = {
@@ -30,8 +33,25 @@ const ViewRide = (props) => {
         car_id: params.id,
         status: 1,
       })
-      .then(res => {
+      .then((res) => {
         setRideStatus(1);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(err.response.data.message);
+      });
+  };
+
+  const handlePassengerJoinRide = () => {
+    axios
+      .post("/tickets/create", {
+        car_id: params.id,
+        boardingStop: searchParams.get("start_stop"),
+        destinationStop: searchParams.get("dest_stop"),
+      })
+      .then((res) => {
+        toast.success("成功加入共乘");
+        navigate("/");
       })
       .catch((err) => {
         console.log(err);
@@ -50,7 +70,7 @@ const ViewRide = (props) => {
     } else if (userInput) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Button size="sm" className={styles.joinRideButton}>
+          <Button size="sm" className={styles.joinRideButton} onClick={handlePassengerJoinRide}>
             加入共乘
           </Button>
           <div className={styles.infoTexts}>
@@ -99,7 +119,7 @@ const ViewRide = (props) => {
           key={index}
           className={`${styles.listGroupItem} ${
             userInput &&
-            (stop.name === userInput.from.name || stop.name === userInput.to.name
+            (stop.name === userInput.from || stop.name === userInput.to
               ? styles.targetStopText
               : null)
           }`}
@@ -109,9 +129,9 @@ const ViewRide = (props) => {
             {arrivalTime
               ? `${
                   userInput
-                    ? stop.name === userInput.from.name
+                    ? stop.name === userInput.from
                       ? "起點"
-                      : stop.name === userInput.to.name
+                      : stop.name === userInput.to
                       ? "終點"
                       : ""
                     : ""

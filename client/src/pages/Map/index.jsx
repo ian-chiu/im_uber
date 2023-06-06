@@ -8,12 +8,14 @@ import ViewRide from "./ViewRide";
 import axios from "~/app/axios";
 import CarIconPng from "~/assets/images/car.png";
 import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
 
 const libraries = ["places"];
 
 const Map = forwardRef((props, _ref) => {
   const naviagte = useNavigate();
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
 
   const [center, setCenter] = useState({ lat: 23.584, lng: 121.178 });
@@ -32,21 +34,10 @@ const Map = forwardRef((props, _ref) => {
   if (location.pathname.includes("/driver/create-ride")) {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
   } else if (location.pathname.split("/")[1] === "ride") {
-    //TODO: use real user input
     const userInput = {
-      ticketPrice: 100,
-      from: {
-        name: "臺積電五廠",
-        latitude: 24.774451062456148,
-        longitude: 120.99816376901293,
-        id: 0,
-      },
-      to: {
-        name: "新竹市立動物園",
-        latitude: 24.80044826523704,
-        longitude: 120.97987888212046,
-        id: 2,
-      },
+      ticketPrice: searchParams.get("ticket_price"),
+      from: searchParams.get("start_stop"),
+      to: searchParams.get("dest_stop"),
     };
     deck = (
       <ViewRide
