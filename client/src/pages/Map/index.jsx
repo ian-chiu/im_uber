@@ -81,8 +81,14 @@ const Map = forwardRef((props, _ref) => {
   });
 
   const calculateRoutes = async () => {
+    const setArrivalTimesForDriverCreateRide = (updated) => {
+      if (location.pathname.includes("/driver/create-ride")) {
+        setArrivalTimes(updated);
+      }
+    };
     if (stops.length === 0) {
       setDirectionResponse(null);
+      setArrivalTimesForDriverCreateRide([]);
       return;
     }
     const updatedArrivalTimes = [
@@ -93,6 +99,7 @@ const Map = forwardRef((props, _ref) => {
     ];
     if (stops.length === 1) {
       setZoom(15);
+      setArrivalTimesForDriverCreateRide([departureTime]);
       setDirectionResponse(null);
       return;
     }
@@ -146,6 +153,7 @@ const Map = forwardRef((props, _ref) => {
         ),
       });
     }
+    setArrivalTimesForDriverCreateRide(updatedArrivalTimes.map(item => item.date));
   };
 
   const handleGoBack = () => {
