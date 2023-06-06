@@ -59,6 +59,23 @@ const ViewRide = (props) => {
       });
   };
 
+  const handleDriverFinishRide = () => {
+    axios
+      .post("/cars/status", {
+        car_id: params.id,
+        status: 2,
+      })
+      .then((res) => {
+        setRideStatus(2);
+        navigate("/driver");
+        toast.success("成功完成共乘");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(err.response.data.message);
+      });
+  };
+
   let bottomPanel = null;
   if (location.pathname.split("/")[1] === "ride") {
     if (ride && ride.status == 1) {
@@ -83,7 +100,9 @@ const ViewRide = (props) => {
     } else {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Card.Text className={`${styles.joinRideButton} ${styles.infoMain}`} >等待駕駛發車</Card.Text>
+          <Card.Text className={`${styles.joinRideButton} ${styles.infoMain}`}>
+            等待駕駛發車
+          </Card.Text>
           <div className={styles.infoTexts}>
             <div>
               票價 {userInput.ticketPrice !== null ? ` NTD ${userInput.ticketPrice}` : "loading..."}
@@ -95,7 +114,7 @@ const ViewRide = (props) => {
   } else if (ride && location.pathname.split("/")[1] === "driver") {
     if (ride && ride.status == 1) {
       bottomPanel = (
-        <Card.Body className={styles.bottomPanel}>
+        <Card.Body className={styles.bottomPanel} onClick={handleDriverFinishRide}>
           <Button size="sm" className={styles.joinRideButton}>
             完成共乘
           </Button>
