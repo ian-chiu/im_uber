@@ -115,7 +115,7 @@ function Home(props) {
 								) :  (data.ride &&
 									<Ticket
 										key={index}
-										linkto={`/ride/${data.car_id}`}
+										linkto={`/ride/${data.car_id}/tickets/${data._id}`}
 										status={data.ride.status}
 										driver={data.ride.driver}
 										license_plate={data.ride.license_plate}
