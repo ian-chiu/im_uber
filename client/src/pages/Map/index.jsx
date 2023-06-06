@@ -21,6 +21,7 @@ const Map = forwardRef((props, _ref) => {
   const [stops, setStops] = useState([]);
   const [arrivalTimes, setArrivalTimes] = useState([]);
   const [ride, setRide] = useState(null);
+  const [driverRevenue, setDriverRevenue] = useState(null);
 
   let deck = null;
   if (location.pathname.includes("/driver/create-ride")) {
@@ -28,6 +29,7 @@ const Map = forwardRef((props, _ref) => {
   } else if (location.pathname.split("/")[1] === "ride") {
     //TODO: use real user input
     const userInput = {
+      ticketPrice: 100,
       from: {
         name: "臺積電五廠",
         latitude: 24.774451062456148,
@@ -51,7 +53,15 @@ const Map = forwardRef((props, _ref) => {
       />
     );
   } else if (location.pathname.includes("/driver/ride/")) {
-    deck = <ViewRide ride={ride} stops={stops} spots={spots} arrivalTimes={arrivalTimes} />;
+    deck = (
+      <ViewRide
+        ride={ride}
+        stops={stops}
+        spots={spots}
+        arrivalTimes={arrivalTimes}
+        driverRevenue={driverRevenue}
+      />
+    );
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -62,7 +72,6 @@ const Map = forwardRef((props, _ref) => {
   const calculateRoutes = async () => {
     if (stops.length === 0) {
       setDirectionResponse(null);
-      setArrivalTimes([]);
       return;
     }
     const updatedArrivalTimes = [
@@ -73,7 +82,6 @@ const Map = forwardRef((props, _ref) => {
     ];
     if (stops.length === 1) {
       setZoom(15);
-      setArrivalTimes(updatedArrivalTimes);
       setDirectionResponse(null);
       return;
     }
@@ -83,17 +91,17 @@ const Map = forwardRef((props, _ref) => {
     const passengerStopIds = new Set();
     if (ride && ride.tickets) {
       for (let ticket of ride.tickets) {
-        passengerStopIds.add(ticket.from.id);
-        passengerStopIds.add(ticket.to.id);
+        passengerStopIds.add(ticket.boardingStop);
+        passengerStopIds.add(ticket.destinationStop);
       }
     }
 
     for (let i = 1; i < stops.length - 1; i++) {
-      if (location.pathname.includes("/driver/ride/")) {
-        if (!passengerStopIds.has(stops[i].id)) {
-          continue;
-        }
-      }
+      // if (location.pathname.includes("/driver/ride/")) {
+      //   if (!passengerStopIds.has(stops[i].name)) {
+      //     continue;
+      //   }
+      // }
       waypointStopIds.push(stops[i].id);
       waypoints.push({
         location: stops[i].position,
@@ -127,7 +135,6 @@ const Map = forwardRef((props, _ref) => {
         ),
       });
     }
-    setArrivalTimes(updatedArrivalTimes);
   };
 
   const handleGoBack = () => {
@@ -139,26 +146,33 @@ const Map = forwardRef((props, _ref) => {
   };
 
   useEffect(() => {
-    axios.get("/stops")
-      .then((res) => {
-        setSpots(res.data);
-      });
+    axios.get("/stops").then((res) => {
+      setSpots(res.data);
+    });
     if (location.pathname.split("/")[1] === "ride" || location.pathname.split("/")[2] === "ride") {
-      fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/rides/asdf")
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setRide(data[0]);
-          setStops(
-            data[0].stops.map((stop) => ({
-              id: stop.id,
-              name: stop.name,
-              position: new window.google.maps.LatLng(stop.latitude, stop.longitude),
-            }))
-          );
-          setDepartureTime(new Date(data[0]["departure_time"]));
-        });
+      axios.get("/cars/647e988ad71311075bf721a2").then((res) => {
+        const data = res.data;
+        setRide(data);
+        setStops(
+          data.stops.map((stop) => ({
+            id: stop.id,
+            name: stop.stopName,
+            position: new window.google.maps.LatLng(
+              stop.location.latitude,
+              stop.location.longitude
+            ),
+          }))
+        );
+        setDepartureTime(new Date(data.departure_time));
+        setArrivalTimes(data.stops.map((stop) => new Date(Date.parse(stop.eta))));
+        let revenue = 0;
+        if (data.tickets && data.tickets.length) {
+          for (let ticket of data.tickets) {
+            revenue += ticket.price;
+          }
+        }
+        setDriverRevenue(revenue);
+      });
     } else if (location.pathname.includes("/driver/create-ride")) {
       if (props.stops) {
         setStops(props.stops);
