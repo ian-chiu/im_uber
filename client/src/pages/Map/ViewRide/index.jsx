@@ -67,7 +67,7 @@ const ViewRide = (props) => {
           <Card.Text>駕駛正在路上...</Card.Text>
         </Card.Body>
       );
-    } else if (userInput) {
+    } else if (userInput && !userInput.joined) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
           <Button size="sm" className={styles.joinRideButton} onClick={handlePassengerJoinRide}>
@@ -83,7 +83,12 @@ const ViewRide = (props) => {
     } else {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Card.Text>等待駕駛發車</Card.Text>
+          <Card.Text className={`${styles.joinRideButton} ${styles.infoMain}`} >等待駕駛發車</Card.Text>
+          <div className={styles.infoTexts}>
+            <div>
+              票價 {userInput.ticketPrice !== null ? ` NTD ${userInput.ticketPrice}` : "loading..."}
+            </div>
+          </div>
         </Card.Body>
       );
     }

@@ -29,16 +29,29 @@ const Map = forwardRef((props, _ref) => {
   const [driverRevenue, setDriverRevenue] = useState(null);
   const [driverPosition, setDriverPosition] = useState(null);
   const [rideStatus, setRideStatus] = useState(null);
+  const [myTicket, setMyTicket] = useState(null);
 
   let deck = null;
   if (location.pathname.includes("/driver/create-ride")) {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
   } else if (location.pathname.split("/")[1] === "ride") {
-    const userInput = {
-      ticketPrice: searchParams.get("ticket_price"),
-      from: searchParams.get("start_stop"),
-      to: searchParams.get("dest_stop"),
-    };
+    let userInput = null;
+    if (searchParams.length) {
+      userInput = {
+        ticketPrice: searchParams.get("ticket_price"),
+        from: searchParams.get("start_stop"),
+        to: searchParams.get("dest_stop"),
+        joined: false
+      };
+    }
+    if (myTicket) {
+      userInput = {
+        ticketPrice: myTicket.price,
+        from: myTicket.boardingStop,
+        to: myTicket.destinationStop,
+        joined: true
+      };
+    }
     deck = (
       <ViewRide
         ride={ride}
@@ -87,7 +100,7 @@ const Map = forwardRef((props, _ref) => {
     const updatedArrivalTimes = [
       {
         stopId: stops[0].id,
-        date: targetTime
+        date: targetTime,
       },
     ];
     if (stops.length === 1) {
@@ -146,7 +159,7 @@ const Map = forwardRef((props, _ref) => {
         ),
       });
     }
-    setArrivalTimesIfConditionMeets(updatedArrivalTimes.map(item => item.date));
+    setArrivalTimesIfConditionMeets(updatedArrivalTimes.map((item) => item.date));
   };
 
   const handleGoBack = () => {
@@ -175,12 +188,17 @@ const Map = forwardRef((props, _ref) => {
         setDepartureTime(new Date(data.departure_time));
         setArrivalTimes(data.stops.map((stop) => new Date(Date.parse(stop.eta))));
         let revenue = 0;
+        let updatedMyTicket = null;
         if (data.tickets && data.tickets.length) {
           for (let ticket of data.tickets) {
             revenue += ticket.price;
+            if (ticket._id === params.ticket_id) {
+              updatedMyTicket = ticket;
+            }
           }
         }
         setDriverRevenue(revenue);
+        setMyTicket(updatedMyTicket);
       });
     }
   };
