@@ -5,7 +5,7 @@ import { getTimeString, getDateString } from "~/utils/time";
 
 const ViewRide = (props) => {
   const location = useLocation();
-  const { stops, ride, userInput, arrivalTimes } = props;
+  const { stops, ride, userInput, arrivalTimes, driverRevenue } = props;
 
   const userInputStopIndex = {
     from: null,
@@ -29,7 +29,9 @@ const ViewRide = (props) => {
           加入共乘
         </Button>
         <div className={styles.infoTexts}>
-          <div>票價NTD100</div>
+          <div>
+            票價 {userInput.ticketPrice !== null ? ` NTD ${userInput.ticketPrice}` : "loading..."}
+          </div>
         </div>
       </Card.Body>
     );
@@ -40,7 +42,7 @@ const ViewRide = (props) => {
           發車
         </Button>
         <div className={styles.infoTexts}>
-          <div>收入NTD100</div>
+          <div>收入{driverRevenue !== null ? ` NTD ${driverRevenue}` : "loading..."}</div>
         </div>
       </Card.Body>
     );
@@ -49,29 +51,29 @@ const ViewRide = (props) => {
   let stopListGroupItems = [];
   if (stops) {
     stops.forEach((stop, index) => {
-      const arrivalTime = arrivalTimes.find((arrivalTime) => arrivalTime.stopId === stop.id);
+      const arrivalTime = arrivalTimes[index];
       const item = (
         <ListGroup.Item
           key={index}
           className={`${styles.listGroupItem} ${
             userInput &&
-            (stop.id === userInput.from.id || stop.id === userInput.to.id
+            (stop.name === userInput.from.name || stop.name === userInput.to.name
               ? styles.targetStopText
               : null)
           }`}
         >
           <div className={`${arrivalTime ? "" : "text-muted"}`}>{stop.name}</div>
-          <div >
+          <div>
             {arrivalTime
               ? `${
                   userInput
-                    ? stop.id === userInput.from.id
+                    ? stop.name === userInput.from.name
                       ? "起點"
-                      : stop.id === userInput.to.id
+                      : stop.name === userInput.to.name
                       ? "終點"
                       : ""
                     : ""
-                } ${getTimeString(arrivalTime.date)}`
+                } ${getTimeString(arrivalTime)}`
               : ""}
           </div>
         </ListGroup.Item>
@@ -86,7 +88,7 @@ const ViewRide = (props) => {
         <Tabs defaultActiveKey="ride-route" fill>
           <Tab eventKey="ride-route" title="路線">
             <Card.Header className="border-bottom">{`日期：${
-              arrivalTimes.length > 0 ? getDateString(arrivalTimes[0].date) : "loading..."
+              arrivalTimes.length > 0 ? getDateString(arrivalTimes[0]) : "loading..."
             }`}</Card.Header>
             <ListGroup variant="flush">{stopListGroupItems}</ListGroup>
           </Tab>
@@ -98,20 +100,20 @@ const ViewRide = (props) => {
                   <Card.Body className={styles.itemContainer}>
                     <div>
                       <div className="small fw-bold">姓名</div>
-                      <div>{ride.driver.name}</div>
+                      <div>{ride.driver}</div>
                     </div>
                     <div>
                       <div className="small fw-bold">電話</div>
-                      <div>{ride.driver.phone}</div>
+                      <div>{ride.driver_phone}</div>
                     </div>
                     <div>
                       <div className="small fw-bold">車牌</div>
-                      <div>{ride.vehicle.license_plate}</div>
+                      <div>{ride.license_plate}</div>
                     </div>
                     <div>
                       <div className="small fw-bold">載客人數</div>
                       <div>
-                        {ride.tickets.length} / {ride.vehicle.seats}人
+                        {ride.tickets.length} / {ride.seats}人
                       </div>
                     </div>
                   </Card.Body>
@@ -124,21 +126,21 @@ const ViewRide = (props) => {
                         <ListGroup.Item className={styles.itemContainer} key={index}>
                           <div>
                             <div className="small fw-bold">姓名</div>
-                            <div>{ticket.user.name}</div>
+                            <div>{ticket.passenger}</div>
                           </div>
                           <div>
                             <div className="small fw-bold">電話</div>
-                            <div>{ticket.user.phone}</div>
+                            <div>{ticket.passenger_phone}</div>
                           </div>
                           {location.pathname.split("/")[1] === "driver" ? (
                             <>
                               <div>
                                 <div className="small fw-bold">起點</div>
-                                <div>{ticket.from.name}</div>
+                                <div>{ticket.boardingStop}</div>
                               </div>
                               <div>
                                 <div className="small fw-bold">終點</div>
-                                <div>{ticket.to.name}</div>
+                                <div>{ticket.destinationStop}</div>
                               </div>
                             </>
                           ) : null}
