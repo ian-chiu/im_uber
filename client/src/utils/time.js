@@ -10,3 +10,9 @@ export const getDateString = (date) => {
   // Generate yyyy-mm-dd date string
   return year + "-" + month + "-" + day;
 };
+export const getDiffString = (diffMs) => {
+  var diffDays = Math.floor(diffMs / 86400000); // days
+  var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+  var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+  return diffHrs + ":" + diffMins
+}

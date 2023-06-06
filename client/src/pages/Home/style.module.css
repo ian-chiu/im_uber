@@ -2,6 +2,7 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    padding-bottom: 100px;
 }
 .searchContainer {
     bottom: 0;
@@ -29,6 +30,7 @@
 }
 .addRideBtn {
     position: fixed;
+    z-index: 11;
     bottom: 20px;
     left: 50%;
     font-size: 18px;

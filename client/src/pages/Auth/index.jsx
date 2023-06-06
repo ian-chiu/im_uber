@@ -5,11 +5,14 @@ import { authActions } from './authSlice'
 import { useState } from 'react'
 import axios from "~/app/axios"
 import { toast } from 'react-toastify'
+import { redirect, useNavigate } from 'react-router'
 
 function Auth(props) {
+    const navigate = useNavigate();
     const dispath = useDispatch()
     const [usernameInput, setUsernameInput] = useState("")
     const [passwordInput, setPasswordInput] = useState("")
+    const [phoneInput, setPhoneInput] = useState("")
     const [confirmPasswordInput, setConfPasswordInput] = useState("")
     const [radioValue, setRadioValue] = useState('passenger');
     const [isLogin, setIsLogin] = useState(true);
@@ -18,19 +21,21 @@ function Auth(props) {
       { name: 'driver', value: 'driver' },
     ];
     function handleLogin() {
-        console.log(usernameInput)
         axios.post("/auth/login", {
             "username": usernameInput,
             "password": passwordInput
-          }).then(res => {
-            dispath(authActions.login())
-            console.log(document.cookie)
-            toast.success("login success")
+          }).then(res_login => {
             axios.post("/users/role", {
                 "role": radioValue
             }).then(res => {
                 dispath(authActions.setRole(radioValue))
+                dispath(authActions.login())
+                dispath(authActions.setUsername(res_login.data["User"].userName))
                 toast.success("login success" + radioValue)
+                if (radioValue == "driver")
+                    navigate("/driver")
+                else
+                    navigate("/")
             })
         }).catch(err => {
             toast.error(err.response.data.message)
@@ -40,7 +45,8 @@ function Auth(props) {
         if (passwordInput == confirmPasswordInput) {
             axios.post("/auth/signup", {
                 "username": usernameInput,
-                "password": passwordInput
+                "password": passwordInput,
+                "phone": phoneInput
               }).then(res => {
                 setIsLogin(true)
                 toast.success("Register success")
@@ -67,11 +73,16 @@ function Auth(props) {
                         <Form.Control type="password" placeholder="Password" value={passwordInput} onChange={(event) => setPasswordInput(event.target.value)}/>
                     </Form.Group>
                     {
-                        !isLogin ?
-                        <Form.Group className="mb-3" controlId="formBasicPassword">
-                            <Form.Label>Confirm Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password" value={confirmPasswordInput} onChange={(event) => setConfPasswordInput(event.target.value)}/>
-                        </Form.Group>
+                        !isLogin ?<>
+                            <Form.Group className="mb-3" controlId="formBasicPassword">
+                                <Form.Label>Confirm Password</Form.Label>
+                                <Form.Control type="password" placeholder="Password" value={confirmPasswordInput} onChange={(event) => setConfPasswordInput(event.target.value)}/>
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="formBasicPassword">
+                                <Form.Label>Phone</Form.Label>
+                                <Form.Control type="phone" placeholder="0900000000" value={phoneInput} onChange={(event) => setPhoneInput(event.target.value)}/>
+                            </Form.Group>
+                        </>
                         :
                         <Form.Group>
                             <Form.Label>Role</Form.Label>

@@ -22,7 +22,7 @@ function Header() {
     return (
         <Navbar bg="light" variant="light" expand="sm">
             <Container>
-                <Navbar.Brand as={Link} to="/home">I'm Uber</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/">I'm Uber</Navbar.Brand>
                 <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-sm`} />
                 <Navbar.Offcanvas
                     id={`offcanvasNavbar-expand-sm`}
