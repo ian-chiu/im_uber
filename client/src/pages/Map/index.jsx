@@ -35,21 +35,18 @@ const Map = forwardRef((props, _ref) => {
   if (location.pathname.includes("/driver/create-ride")) {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
   } else if (location.pathname.split("/")[1] === "ride") {
-    let userInput = null;
-    if (searchParams.length) {
-      userInput = {
-        ticketPrice: searchParams.get("ticket_price"),
-        from: searchParams.get("start_stop"),
-        to: searchParams.get("dest_stop"),
-        joined: false
-      };
-    }
+    let userInput = {
+      ticketPrice: searchParams.get("ticket_price"),
+      from: searchParams.get("start_stop"),
+      to: searchParams.get("dest_stop"),
+      joined: false,
+    };
     if (myTicket) {
       userInput = {
         ticketPrice: myTicket.price,
         from: myTicket.boardingStop,
         to: myTicket.destinationStop,
-        joined: true
+        joined: true,
       };
     }
     deck = (
