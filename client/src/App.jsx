@@ -28,6 +28,7 @@ function App() {
     {isAuth ? <>
         <Route path="driver/ride/:id" element={<Map />} />
         <Route path="driver/create-ride" element={<CreateRide/>} />
+        <Route path="ride/:id/tickets/:ticket_id" element={<Map />} />
         <Route path="ride/:id" element={<Map />} />
         <Route path='*' element={<Home/>} />
       </>:

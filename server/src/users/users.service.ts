@@ -30,7 +30,7 @@ export class UsersService {
     }
   }
   //log in user using the findOne method
-  async getUser(userName: string) {
+  async getUserByName(userName: string) {
     const username = userName.toLowerCase();
     const user = await this.userModel.findOne({ username });
     return user;
