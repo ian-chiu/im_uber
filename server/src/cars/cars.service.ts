@@ -32,7 +32,7 @@ export class CarsService {
     licensePlate: string,
     seats: number,
   ) {
-    const driver = await this.usersService.getUser(driverUsername);
+    const driver = await this.usersService.getUserByName(driverUsername);
 
     if (driver.role !== 'driver') {
       throw new BadRequestException('The driver must have a driver role');
@@ -226,7 +226,8 @@ export class CarsService {
 
     for (const car of filteredCars) {
       const tickets = await this.ticketsService.getTicketsByCarId(car._id);
-      const driver_phone = (await this.usersService.getUser(car.driver)).phone;
+      const driver_phone = (await this.usersService.getUserByName(car.driver))
+        .phone;
       const newCar = {
         ...car.toObject(),
         driver_phone: driver_phone,
@@ -276,10 +277,31 @@ export class CarsService {
 
   async getCarInfoById(carId: string) {
     const car = await this.getCarById(carId);
-    const driver_phone = (await this.usersService.getUser(car.driver)).phone;
+    const stopWithLocation = [];
+    for (const stop in car.stops) {
+      const stopDetail = await this.stopsService.getStopByName(
+        car.stops[stop].stopName,
+      );
+      const newStop = {
+        _id: car.stops[stop]._id,
+        stopName: stopDetail.name,
+        eta: car.stops[stop].eta,
+        location: {
+          latitude: stopDetail.location.coordinates[1],
+          longitude: stopDetail.location.coordinates[0],
+        },
+      };
+      stopWithLocation.push(newStop);
+    }
+    const driver_phone = (await this.usersService.getUserByName(car.driver))
+      .phone;
     const tickets = await this.ticketsService.getTicketsByCarId(carId);
-    return {
+    const newCar = {
       ...car.toObject(),
+    };
+    newCar.stops = stopWithLocation;
+    return {
+      ...newCar,
       driver_phone: driver_phone,
       tickets: tickets,
     };

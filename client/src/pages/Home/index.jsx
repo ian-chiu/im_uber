@@ -97,9 +97,9 @@ function Home(props) {
 									}
 								}
 								// console.log(role == "driver", data, new Date(data.departure_time))
-								return role == "driver" ? (data.stops && data.stops.length > 0 && 
-									<Ticket 
-										key={index} 
+								return role == "driver" ? (data.stops && data.stops.length > 0 &&
+									<Ticket
+										key={index}
 										linkto={`/driver/ride/${data._id}`}
 										status={data.status}
 										driver={data.driver}
@@ -111,11 +111,11 @@ function Home(props) {
 										arrival_stop={data.stops[0]["stopName"]}
 										departure_timestamp={new Date(Date.parse(data.departure_time))}
 										arrival_timestamp={new Date(Date.parse(data.stops.slice(-1)[0]["eta"]))}
-									/> 
-								) :  (data.ride && 
-									<Ticket 
-										key={index} 
-										linkto={`/ride/${data._id}`} 
+									/>
+								) :  (data.ride &&
+									<Ticket
+										key={index}
+										linkto={`/ride/${data.car_id}/tickets/${data._id}`}
 										status={data.ride.status}
 										driver={data.ride.driver}
 										license_plate={data.ride.license_plate}
@@ -126,7 +126,7 @@ function Home(props) {
 										arrival_stop={data.destinationStop}
 										departure_timestamp={new Date(Date.parse(data.departure_time))}
 										arrival_timestamp={new Date(Date.parse(data.arrival_time))}
-									/> 
+									/>
 								)
 							})}
 						</div>

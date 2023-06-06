@@ -1,16 +1,21 @@
 import styles from "./style.module.css";
-import { GoogleMap, useJsApiLoader, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, DirectionsRenderer, MarkerF } from "@react-google-maps/api";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import SetRoute from "./SetRoute";
 import ViewRide from "./ViewRide";
 import axios from "~/app/axios";
+import CarIconPng from "~/assets/images/car.png";
+import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
 
 const libraries = ["places"];
 
 const Map = forwardRef((props, _ref) => {
   const naviagte = useNavigate();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
 
   const [center, setCenter] = useState({ lat: 23.584, lng: 121.178 });
@@ -21,26 +26,32 @@ const Map = forwardRef((props, _ref) => {
   const [stops, setStops] = useState([]);
   const [arrivalTimes, setArrivalTimes] = useState([]);
   const [ride, setRide] = useState(null);
+  const [driverRevenue, setDriverRevenue] = useState(null);
+  const [driverPosition, setDriverPosition] = useState(null);
+  const [rideStatus, setRideStatus] = useState(null);
+  const [myTicket, setMyTicket] = useState(null);
 
   let deck = null;
   if (location.pathname.includes("/driver/create-ride")) {
     deck = <SetRoute stops={stops} setStops={setStops} spots={spots} arrivalTimes={arrivalTimes} />;
   } else if (location.pathname.split("/")[1] === "ride") {
-    //TODO: use real user input
-    const userInput = {
-      from: {
-        name: "臺積電五廠",
-        latitude: 24.774451062456148,
-        longitude: 120.99816376901293,
-        id: 0,
-      },
-      to: {
-        name: "新竹市立動物園",
-        latitude: 24.80044826523704,
-        longitude: 120.97987888212046,
-        id: 2,
-      },
-    };
+    let userInput = null;
+    if (searchParams.length) {
+      userInput = {
+        ticketPrice: searchParams.get("ticket_price"),
+        from: searchParams.get("start_stop"),
+        to: searchParams.get("dest_stop"),
+        joined: false
+      };
+    }
+    if (myTicket) {
+      userInput = {
+        ticketPrice: myTicket.price,
+        from: myTicket.boardingStop,
+        to: myTicket.destinationStop,
+        joined: true
+      };
+    }
     deck = (
       <ViewRide
         ride={ride}
@@ -51,7 +62,21 @@ const Map = forwardRef((props, _ref) => {
       />
     );
   } else if (location.pathname.includes("/driver/ride/")) {
-    deck = <ViewRide ride={ride} stops={stops} spots={spots} arrivalTimes={arrivalTimes} />;
+    deck = (
+      <ViewRide
+        ride={ride}
+        setRideStatus={setRideStatus}
+        stops={stops}
+        spots={spots}
+        arrivalTimes={arrivalTimes}
+        driverRevenue={driverRevenue}
+      />
+    );
+  }
+
+  let driverMarker = null;
+  if (driverPosition) {
+    driverMarker = <MarkerF position={driverPosition} icon={CarIconPng} />;
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -60,20 +85,27 @@ const Map = forwardRef((props, _ref) => {
   });
 
   const calculateRoutes = async () => {
+    const currentTime = new Date();
+    const setArrivalTimesIfConditionMeets = (updated) => {
+      if (location.pathname.includes("/driver/create-ride") || currentTime > departureTime) {
+        setArrivalTimes(updated);
+      }
+    };
     if (stops.length === 0) {
       setDirectionResponse(null);
-      setArrivalTimes([]);
+      setArrivalTimesIfConditionMeets([]);
       return;
     }
+    const targetTime = currentTime > departureTime ? currentTime : departureTime;
     const updatedArrivalTimes = [
       {
         stopId: stops[0].id,
-        date: new Date(departureTime),
+        date: targetTime,
       },
     ];
     if (stops.length === 1) {
       setZoom(15);
-      setArrivalTimes(updatedArrivalTimes);
+      setArrivalTimesIfConditionMeets([targetTime]);
       setDirectionResponse(null);
       return;
     }
@@ -83,17 +115,17 @@ const Map = forwardRef((props, _ref) => {
     const passengerStopIds = new Set();
     if (ride && ride.tickets) {
       for (let ticket of ride.tickets) {
-        passengerStopIds.add(ticket.from.id);
-        passengerStopIds.add(ticket.to.id);
+        passengerStopIds.add(ticket.boardingStop);
+        passengerStopIds.add(ticket.destinationStop);
       }
     }
 
     for (let i = 1; i < stops.length - 1; i++) {
-      if (location.pathname.includes("/driver/ride/")) {
-        if (!passengerStopIds.has(stops[i].id)) {
-          continue;
-        }
-      }
+      // if (location.pathname.includes("/driver/ride/")) {
+      //   if (!passengerStopIds.has(stops[i].name)) {
+      //     continue;
+      //   }
+      // }
       waypointStopIds.push(stops[i].id);
       waypoints.push({
         location: stops[i].position,
@@ -107,7 +139,7 @@ const Map = forwardRef((props, _ref) => {
       waypoints: waypoints,
       travelMode: window.google.maps.TravelMode.DRIVING,
       drivingOptions: {
-        departureTime: departureTime,
+        departureTime: targetTime,
         trafficModel: "pessimistic",
       },
     });
@@ -127,7 +159,7 @@ const Map = forwardRef((props, _ref) => {
         ),
       });
     }
-    setArrivalTimes(updatedArrivalTimes);
+    setArrivalTimesIfConditionMeets(updatedArrivalTimes.map((item) => item.date));
   };
 
   const handleGoBack = () => {
@@ -138,28 +170,45 @@ const Map = forwardRef((props, _ref) => {
     }
   };
 
-  useEffect(() => {
-    axios.get("/stops")
-      .then((res) => {
-        setSpots(res.data);
-      });
+  const getCarsFromId = () => {
     if (location.pathname.split("/")[1] === "ride" || location.pathname.split("/")[2] === "ride") {
-      fetch("https://virtserver.swaggerhub.com/MONEY678678/im_uber/1.0.0/rides/asdf")
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setRide(data[0]);
-          setStops(
-            data[0].stops.map((stop) => ({
-              id: stop.id,
-              name: stop.name,
-              position: new window.google.maps.LatLng(stop.latitude, stop.longitude),
-            }))
-          );
-          setDepartureTime(new Date(data[0]["departure_time"]));
-        });
-    } else if (location.pathname.includes("/driver/create-ride")) {
+      axios.get(`/cars/${params.id}`).then((res) => {
+        const data = res.data;
+        setRide(data);
+        setStops(
+          data.stops.map((stop) => ({
+            id: stop.id,
+            name: stop.stopName,
+            position: new window.google.maps.LatLng(
+              stop.location.latitude,
+              stop.location.longitude
+            ),
+          }))
+        );
+        setDepartureTime(new Date(data.departure_time));
+        setArrivalTimes(data.stops.map((stop) => new Date(Date.parse(stop.eta))));
+        let revenue = 0;
+        let updatedMyTicket = null;
+        if (data.tickets && data.tickets.length) {
+          for (let ticket of data.tickets) {
+            revenue += ticket.price;
+            if (ticket._id === params.ticket_id) {
+              updatedMyTicket = ticket;
+            }
+          }
+        }
+        setDriverRevenue(revenue);
+        setMyTicket(updatedMyTicket);
+      });
+    }
+  };
+
+  useEffect(() => {
+    axios.get("/stops").then((res) => {
+      setSpots(res.data);
+    });
+    getCarsFromId();
+    if (location.pathname.includes("/driver/create-ride")) {
       if (props.stops) {
         setStops(props.stops);
       }
@@ -171,6 +220,10 @@ const Map = forwardRef((props, _ref) => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    getCarsFromId();
+  }, [rideStatus]);
 
   useEffect(() => {
     calculateRoutes();
@@ -193,6 +246,45 @@ const Map = forwardRef((props, _ref) => {
     },
   }));
 
+  useEffect(() => {
+    if (!ride || !ride.status === 1) {
+      return;
+    }
+    const postDriverGeoPosition = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          axios
+            .post("/cars/update-gps", {
+              gps_position: {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              },
+            })
+            .catch((err) => {
+              toast.error(err.response.data.message);
+            });
+        },
+        (err) => {
+          toast.error("無法取得駕駛GPS座標");
+          console.log(err);
+        }
+      );
+    };
+    const getDriverGeoPosition = () => {
+      axios.get(`/cars/${params.id}/gps`).then((res) => {
+        const position = res.data.gps_position;
+        setDriverPosition(new window.google.maps.LatLng(position.latitude, position.longitude));
+      });
+    };
+    const timeInterval = 15000;
+    if (location.pathname.includes("/driver/ride/")) {
+      postDriverGeoPosition();
+      setInterval(postDriverGeoPosition, timeInterval);
+    }
+    getDriverGeoPosition();
+    setInterval(getDriverGeoPosition, timeInterval);
+  }, [ride]);
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.goBackButton} onClick={handleGoBack}>
@@ -210,6 +302,7 @@ const Map = forwardRef((props, _ref) => {
             }}
           >
             {directionResponse && <DirectionsRenderer directions={directionResponse} />}
+            {driverMarker}
           </GoogleMap>
         ) : (
           <div>Loading...</div>
