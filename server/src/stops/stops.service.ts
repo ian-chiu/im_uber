@@ -1,8 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Stop } from 'src/stops/stops.model';
 
 @Injectable()
 export class StopsService {
-  getStops(): any {
+  constructor(@InjectModel('stop') private readonly stopModel: Model<Stop>) {}
+
+  async insertStop(name: string, latitude: number, longitude: number) {
+    const newStop = new this.stopModel({
+      name,
+      location: {
+        type: 'Point',
+        // longitude comes first in GeoJSON
+        coordinates: [longitude, latitude],
+      },
+    });
+    try {
+      await newStop.save();
+      return newStop;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('Stop already exists');
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getStops() {
+    const stops = await this.stopModel.find();
+    return stops;
+  }
+
+  async getStopByName(stopName: string) {
+    const stop = await this.stopModel.findOne({ name: stopName });
+    return stop;
+  }
+
+  getStops_dev(): any {
     return [
       {
         id: 0,
