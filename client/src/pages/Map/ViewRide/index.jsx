@@ -1,11 +1,14 @@
 import styles from "./style.module.css";
 import { Card, ListGroup, Tab, Tabs, Button } from "react-bootstrap";
-import { useLocation } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { getTimeString, getDateString } from "~/utils/time";
+import axios from "~/app/axios";
+import { toast } from "react-toastify";
 
 const ViewRide = (props) => {
+  const params = useParams();
   const location = useLocation();
-  const { stops, ride, userInput, arrivalTimes, driverRevenue } = props;
+  const { stops, ride, setRideStatus, userInput, arrivalTimes, driverRevenue } = props;
 
   const userInputStopIndex = {
     from: null,
@@ -21,14 +24,27 @@ const ViewRide = (props) => {
     }
   }
 
+  const handleDriverStartRide = () => {
+    axios
+      .post("/cars/status", {
+        car_id: params.id,
+        status: 1,
+      })
+      .then(res => {
+        setRideStatus(1);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(err.response.data.message);
+      });
+  };
+
   let bottomPanel = null;
   if (location.pathname.split("/")[1] === "ride") {
     if (ride && ride.status == 1) {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Card.Text>
-            駕駛正在路上...
-          </Card.Text>
+          <Card.Text>駕駛正在路上...</Card.Text>
         </Card.Body>
       );
     } else if (userInput) {
@@ -43,13 +59,11 @@ const ViewRide = (props) => {
             </div>
           </div>
         </Card.Body>
-      )
+      );
     } else {
       bottomPanel = (
         <Card.Body className={styles.bottomPanel}>
-          <Card.Text>
-            等待駕駛發車
-          </Card.Text>
+          <Card.Text>等待駕駛發車</Card.Text>
         </Card.Body>
       );
     }
@@ -64,14 +78,14 @@ const ViewRide = (props) => {
       );
     } else {
       bottomPanel = (
-      <Card.Body className={styles.bottomPanel}>
-        <Button size="sm" className={styles.joinRideButton}>
-          發車
-        </Button>
-        <div className={styles.infoTexts}>
-          <div>收入{driverRevenue !== null ? ` NTD ${driverRevenue}` : "loading..."}</div>
-        </div>
-      </Card.Body>
+        <Card.Body className={styles.bottomPanel}>
+          <Button size="sm" className={styles.joinRideButton} onClick={handleDriverStartRide}>
+            發車
+          </Button>
+          <div className={styles.infoTexts}>
+            <div>收入{driverRevenue !== null ? ` NTD ${driverRevenue}` : "loading..."}</div>
+          </div>
+        </Card.Body>
       );
     }
   }

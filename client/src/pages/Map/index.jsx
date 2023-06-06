@@ -26,6 +26,7 @@ const Map = forwardRef((props, _ref) => {
   const [ride, setRide] = useState(null);
   const [driverRevenue, setDriverRevenue] = useState(null);
   const [driverPosition, setDriverPosition] = useState(null);
+  const [rideStatus, setRideStatus] = useState(null);
 
   let deck = null;
   if (location.pathname.includes("/driver/create-ride")) {
@@ -60,6 +61,7 @@ const Map = forwardRef((props, _ref) => {
     deck = (
       <ViewRide
         ride={ride}
+        setRideStatus={setRideStatus}
         stops={stops}
         spots={spots}
         arrivalTimes={arrivalTimes}
@@ -154,10 +156,7 @@ const Map = forwardRef((props, _ref) => {
     }
   };
 
-  useEffect(() => {
-    axios.get("/stops").then((res) => {
-      setSpots(res.data);
-    });
+  const getCarsFromId = () => {
     if (location.pathname.split("/")[1] === "ride" || location.pathname.split("/")[2] === "ride") {
       axios.get(`/cars/${params.id}`).then((res) => {
         const data = res.data;
@@ -182,7 +181,15 @@ const Map = forwardRef((props, _ref) => {
         }
         setDriverRevenue(revenue);
       });
-    } else if (location.pathname.includes("/driver/create-ride")) {
+    }
+  };
+
+  useEffect(() => {
+    axios.get("/stops").then((res) => {
+      setSpots(res.data);
+    });
+    getCarsFromId();
+    if (location.pathname.includes("/driver/create-ride")) {
       if (props.stops) {
         setStops(props.stops);
       }
@@ -194,6 +201,10 @@ const Map = forwardRef((props, _ref) => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    getCarsFromId();
+  }, [rideStatus]);
 
   useEffect(() => {
     calculateRoutes();
