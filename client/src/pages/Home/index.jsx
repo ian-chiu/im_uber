@@ -28,20 +28,25 @@ function Home(props) {
 	const [departureTime, setDepartureTime] = useState(new Date())
 	const [stops, setStops] = useState(null)
 	const role = location.pathname.includes("driver") ? "driver" : "passenger"
-	useDebounce(() => {
+	useEffect(() => {
+		props.setIsLoading(true)
+	}, [])
+	useEffect(() => {
 		axios.get("/stops").then((res) => {
 			setStops(res.data)
 		}).catch(handleError)
 		if (location.pathname.includes("driver")) {
 			axios.get(`/cars?driver=${username}`).then((res) => {
 				setData(res.data)
+				props.setIsLoading(false)
 			})
-		} else {
+		} else if (!location.pathname.includes("auth")) {
 			axios.get("/tickets").then((res) => {
 				setData(res.data)
+				props.setIsLoading(false)
 			})
 		}
-	}, 500, [username, location])
+	}, [username, location])
 	const searchQuery = (stops && departure > -1 && departureTime && arrival > -1 ?
 		`?start_stop=${stops[departure].name}&dest_stop=${stops[arrival].name}&start_time=${departureTime.toISOString()}` : ""
 	);
@@ -50,7 +55,7 @@ function Home(props) {
 		<Header/>
         <Routes>
 			{/* {role == "driver" && <Route path='*' element={<Search searchInput={searchInput} />}/>} */}
-			<Route path='/search' element={<Search />} />
+			<Route path='/search' element={<Search setIsLoading={props.setIsLoading}/>} />
 			<Route path='*' element={
 				<>
 				{!(role == "driver") && (
@@ -107,8 +112,8 @@ function Home(props) {
 										price={price}
 										occupied={data.passengers.length}
 										seats={data.seats}
-										departure_stop={data.stops.slice(-1)[0]["stopName"]}
-										arrival_stop={data.stops[0]["stopName"]}
+										departure_stop={data.stops[0]["stopName"]}
+										arrival_stop={data.stops.slice(-1)[0]["stopName"]}
 										departure_timestamp={new Date(Date.parse(data.departure_time))}
 										arrival_timestamp={new Date(Date.parse(data.stops.slice(-1)[0]["eta"]))}
 									/>

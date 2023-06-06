@@ -14,31 +14,41 @@ import styles from './style.module.css'
 function Home(props) {
 	const searchParams = new URLSearchParams(document.location.search)
 	const [data, setData] = useState(null)
-	const [arrival, setArrival] = useState(0)
-	const [departure, setDeparture] = useState(1)
+	const [arrivalInput, setArrivalInput] = useState(0)
+	const [departureInput, setDepartureInput] = useState(1)
+	const [arrival, setArrival] = useState(null)
+	const [departure, setDeparture] = useState(null)
 	const [departureTime, setDepartureTime] = useState(new Date())
 	const [stops, setStops] = useState(null)
 	useEffect(() => {
+		props.setIsLoading(true)
 		axios.get("/stops").then((res) => {
 			setStops(res.data)
 			if (Array.from(searchParams).length > 0) {
 				let start_index = res.data.findIndex(el => el.name == searchParams.get('start_stop'))
 				let end_index = res.data.findIndex(el => el.name == searchParams.get('dest_stop'))
-				setDeparture(start_index)
-				setArrival(end_index)
+				setDepartureInput(start_index)
+				setArrivalInput(end_index)
+				setDeparture(searchParams.get('start_stop'))
+				setArrival(searchParams.get('dest_stop'))
 				axios.get(`/cars?start_stop=${searchParams.get('start_stop')}&dest_stop=${searchParams.get('dest_stop')}&start_time=${searchParams.get('start_time')}`).then((res) => {
 					setData(res.data)
+					props.setIsLoading(false)
 				}).catch(handleError)
 			}
 		}).catch(handleError)
 	}, [])
 	function handleSearch() {
-		let start_stop = stops[departure].name
-		let dest_stop = stops[arrival].name
+		props.setIsLoading(true)
+		let start_stop = stops[departureInput].name
+		let dest_stop = stops[arrivalInput].name
 		let start_time = departureTime.toISOString()
 		axios.get(`/cars?start_stop=${start_stop}&dest_stop=${dest_stop}&start_time=${start_time}`).then((res) => {
 			console.log(res.data)
 			setData(res.data)
+			setDeparture(start_stop)
+			setArrival(dest_stop)
+			props.setIsLoading(false)
 		})
 	}
 	return (
@@ -49,12 +59,12 @@ function Home(props) {
 						{
 							<InputGroup>
 								<FloatingLabel controlId="floatingDeparture" label="出發站">
-									<Form.Select onChange={(evt) => setDeparture(evt.target.value)} value={departure}>
+									<Form.Select onChange={(evt) => setDepartureInput(evt.target.value)} value={departureInput}>
 										{stops && stops.map((stop, index) => <option key={index} value={index}>{stop.name}</option>)}
 									</Form.Select>
 								</FloatingLabel>
 								<FloatingLabel controlId="floatingArrival" label="目的站">
-									<Form.Select onChange={(evt) => setArrival(evt.target.value)} value={arrival}>
+									<Form.Select onChange={(evt) => setArrivalInput(evt.target.value)} value={arrivalInput}>
 										{stops && stops.map((stop, index) => <option key={index} value={index}>{stop.name}</option>)}
 									</Form.Select>
 								</FloatingLabel>
@@ -76,18 +86,21 @@ function Home(props) {
 				</Alert>
 				<div className={styles.tickets}>
 					{data && data.map((data, index) => {
-						let departure_stop = data.stops.find(el => el.stopName == stops[departure].name)
-						let arrival_stop = data.stops.find(el => el.stopName == stops[arrival].name)
+						let deparutre_index = data.stops.findIndex(el => el.stopName == departure)
+						let arrival_index = data.stops.findIndex(el => el.stopName == arrival)
+						let departure_stop = data.stops[deparutre_index]
+						let arrival_stop = data.stops[arrival_index]
 						var diffMs = (new Date(Date.parse(departure_stop.eta)) - new Date(Date.parse(arrival_stop.eta)));
 						var diffMins = Math.abs(Math.round(((diffMs % 86400000) % 3600000) / 60000)); // minutes
-
+						if (deparutre_index > arrival_index || data.status != 0)
+							return
 						return <Ticket
 							key={index}
-							linkto={`/ride/${data._id}?start_stop=${stops[departure].name}&dest_stop=${stops[arrival].name}&ticket_price=${diffMins*10}`}
+							linkto={`/ride/${data._id}?start_stop=${stops[departureInput].name}&dest_stop=${stops[arrivalInput].name}&ticket_price=${diffMins}`}
 							status={data.status}
 							driver={data.driver}
 							license_plate={data.license_plate}
-							price={diffMins * 10}
+							price={diffMins}
 							occupied={data.tickets.length}
 							seats={data.seats}
 							departure_stop={departure_stop.stopName}
