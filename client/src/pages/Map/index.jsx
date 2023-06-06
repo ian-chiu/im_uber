@@ -81,25 +81,27 @@ const Map = forwardRef((props, _ref) => {
   });
 
   const calculateRoutes = async () => {
-    const setArrivalTimesForDriverCreateRide = (updated) => {
-      if (location.pathname.includes("/driver/create-ride")) {
+    const currentTime = new Date();
+    const setArrivalTimesIfConditionMeets = (updated) => {
+      if (location.pathname.includes("/driver/create-ride") || currentTime > departureTime) {
         setArrivalTimes(updated);
       }
     };
     if (stops.length === 0) {
       setDirectionResponse(null);
-      setArrivalTimesForDriverCreateRide([]);
+      setArrivalTimesIfConditionMeets([]);
       return;
     }
+    const targetTime = currentTime > departureTime ? currentTime : departureTime;
     const updatedArrivalTimes = [
       {
         stopId: stops[0].id,
-        date: new Date(departureTime),
+        date: targetTime
       },
     ];
     if (stops.length === 1) {
       setZoom(15);
-      setArrivalTimesForDriverCreateRide([departureTime]);
+      setArrivalTimesIfConditionMeets([targetTime]);
       setDirectionResponse(null);
       return;
     }
@@ -133,7 +135,7 @@ const Map = forwardRef((props, _ref) => {
       waypoints: waypoints,
       travelMode: window.google.maps.TravelMode.DRIVING,
       drivingOptions: {
-        departureTime: departureTime,
+        departureTime: targetTime,
         trafficModel: "pessimistic",
       },
     });
@@ -153,7 +155,7 @@ const Map = forwardRef((props, _ref) => {
         ),
       });
     }
-    setArrivalTimesForDriverCreateRide(updatedArrivalTimes.map(item => item.date));
+    setArrivalTimesIfConditionMeets(updatedArrivalTimes.map(item => item.date));
   };
 
   const handleGoBack = () => {
