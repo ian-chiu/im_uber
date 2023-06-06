@@ -68,7 +68,7 @@ function Home(props) {
 						}
 					</div>
 				</Container>
-			</Container>	
+			</Container>
 			<Container fluid="md">
 				<Alert variant={"danger"} className='p-2 mt-4 small'>
 					<i className="fa-solid fa-circle-exclamation m-1"></i>
@@ -81,9 +81,9 @@ function Home(props) {
 						var diffMs = (new Date(Date.parse(departure_stop.eta)) - new Date(Date.parse(arrival_stop.eta)));
 						var diffMins = Math.abs(Math.round(((diffMs % 86400000) % 3600000) / 60000)); // minutes
 
-						return <Ticket 
-							key={index} 
-							linkto={`/ride/${data._id}`} 
+						return <Ticket
+							key={index}
+							linkto={`/ride/${data._id}?start_stop=${stops[departure].name}&dest_stop=${stops[arrival].name}&ticket_price=${diffMins*10}`}
 							status={data.status}
 							driver={data.driver}
 							license_plate={data.license_plate}
@@ -94,7 +94,7 @@ function Home(props) {
 							arrival_stop={arrival_stop.stopName}
 							departure_timestamp={new Date(Date.parse(departure_stop.eta))}
 							arrival_timestamp={new Date(Date.parse(arrival_stop.eta))}
-						/> 
+						/>
 					})}
 				</div>
 			</Container>
@@ -123,7 +123,7 @@ var data = [
 			"license_plate": "ABC-1234",
 			"seats": 5
 		}
-	}, 
+	},
 	{
 		"to": "新竹高鐵站",
 		"from": "臺積23廠",
