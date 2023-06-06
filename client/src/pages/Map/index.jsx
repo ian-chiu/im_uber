@@ -274,12 +274,23 @@ const Map = forwardRef((props, _ref) => {
       });
     };
     const timeInterval = 15000;
+    let driverTimerId = null;
+    let passengerTimerId = null;
     if (location.pathname.includes("/driver/ride/")) {
       postDriverGeoPosition();
-      setInterval(postDriverGeoPosition, timeInterval);
+      driverTimerId = setInterval(postDriverGeoPosition, timeInterval);
     }
     getDriverGeoPosition();
-    setInterval(getDriverGeoPosition, timeInterval);
+    passengerTimerId = setInterval(getDriverGeoPosition, timeInterval);
+
+    return () => {
+      if (driverTimerId) {
+        clearInterval(driverTimerId);
+      }
+      if (passengerTimerId) {
+        clearInterval(passengerTimerId);
+      }
+    }
   }, [ride]);
 
   return (
