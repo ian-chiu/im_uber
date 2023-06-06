@@ -90,10 +90,22 @@ const CreateRide = () => {
   };
   const handleDepartureTimeChange = (moment) => {
     setValues((prevValues) => ({ ...prevValues, departureTime: moment }));
+    if (arrivalTimes.length > 0) {
+      const timeDiff =
+        moment.toDate().getTime() - new Date(values.departureTime.toISOString()).getTime();
+      setArrivalTimes((prevArrivalTimes) => {
+        return prevArrivalTimes.map((arrivalTime) => {
+          const updatedArrivalTime = new Date(arrivalTime);
+          updatedArrivalTime.setTime(arrivalTime.getTime() + timeDiff);
+          return updatedArrivalTime;
+        });
+      });
+    }
   };
   const handleMaxPassengersChange = (event) => {
     setValues((prevValues) => ({ ...prevValues, maxPassengers: event.target.value }));
   };
+  console.log(arrivalTimes);
 
   return (
     <>
