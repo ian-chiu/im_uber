@@ -2,16 +2,18 @@ import styles from "./style.module.css";
 import { GoogleMap, useJsApiLoader, DirectionsRenderer, MarkerF } from "@react-google-maps/api";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import SetRoute from "./SetRoute";
 import ViewRide from "./ViewRide";
 import axios from "~/app/axios";
-import CarIconPng from "~/assets/images/car.png"
+import CarIconPng from "~/assets/images/car.png";
+import { toast } from "react-toastify";
 
 const libraries = ["places"];
 
 const Map = forwardRef((props, _ref) => {
   const naviagte = useNavigate();
+  const params = useParams();
   const location = useLocation();
 
   const [center, setCenter] = useState({ lat: 23.584, lng: 121.178 });
@@ -68,12 +70,7 @@ const Map = forwardRef((props, _ref) => {
 
   let driverMarker = null;
   if (driverPosition) {
-    driverMarker = (
-      <MarkerF
-        position={driverPosition.position}
-        icon={CarIconPng}
-      />
-    );
+    driverMarker = <MarkerF position={driverPosition} icon={CarIconPng} />;
   }
 
   const { isLoaded } = useJsApiLoader({
@@ -162,7 +159,7 @@ const Map = forwardRef((props, _ref) => {
       setSpots(res.data);
     });
     if (location.pathname.split("/")[1] === "ride" || location.pathname.split("/")[2] === "ride") {
-      axios.get("/cars/647e988ad71311075bf721a2").then((res) => {
+      axios.get(`/cars/${params.id}`).then((res) => {
         const data = res.data;
         setRide(data);
         setStops(
@@ -223,21 +220,39 @@ const Map = forwardRef((props, _ref) => {
     if (!ride || !ride.status === 1) {
       return;
     }
-    const getDriverGeoPosition = () => {
+    const postDriverGeoPosition = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setDriverPosition({
-            position: new window.google.maps.LatLng(position.coords.latitude, position.coords.longitude),
-            timestamp: new Date().getTime(),
-          });
+          axios
+            .post("/cars/update-gps", {
+              gps_position: {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              },
+            })
+            .catch((err) => {
+              toast.error(err.response.data.message);
+            });
         },
         (err) => {
+          toast.error("無法取得駕駛GPS座標");
           console.log(err);
         }
       );
+    };
+    const getDriverGeoPosition = () => {
+      axios.get(`/cars/${params.id}/gps`).then((res) => {
+        const position = res.data.gps_position;
+        setDriverPosition(new window.google.maps.LatLng(position.latitude, position.longitude));
+      });
+    };
+    const timeInterval = 15000;
+    if (location.pathname.includes("/driver/ride/")) {
+      postDriverGeoPosition();
+      setInterval(postDriverGeoPosition, timeInterval);
     }
     getDriverGeoPosition();
-    setInterval(getDriverGeoPosition, 15000);
+    setInterval(getDriverGeoPosition, timeInterval);
   }, [ride]);
 
   return (
