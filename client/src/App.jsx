@@ -30,13 +30,13 @@ function App() {
         <Route path="driver/create-ride" element={<CreateRide/>} />
         <Route path="ride/:id/tickets/:ticket_id" element={<Map />} />
         <Route path="ride/:id" element={<Map />} />
-        <Route path='*' element={<Home/>} />
+        <Route path='*' element={<Home setIsLoading={setIsLoading}/>} />
       </>:
-      <Route path='*' element={<Auth />} />
+      <Route path='*' element={<Auth setIsLoading={setIsLoading}/>} />
     }
     </Routes>
     <ToastContainer />
-    <Spinner isLoading={isLoading} message={"loading"}/>
+    <Spinner isLoading={isLoading}/>
     </>
   );
 }

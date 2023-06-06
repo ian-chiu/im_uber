@@ -6,6 +6,7 @@ import { useState } from 'react'
 import axios from "~/app/axios"
 import { toast } from 'react-toastify'
 import { redirect, useNavigate } from 'react-router'
+import { useEffect } from 'react'
 
 function Auth(props) {
     const navigate = useNavigate();
@@ -20,6 +21,9 @@ function Auth(props) {
       { name: 'passenger', value: 'passenger' },
       { name: 'driver', value: 'driver' },
     ];
+    useEffect(() => {
+        props.setIsLoading(false)
+    })
     function handleLogin() {
         axios.post("/auth/login", {
             "username": usernameInput,
@@ -31,7 +35,7 @@ function Auth(props) {
                 dispath(authActions.setRole(radioValue))
                 dispath(authActions.login())
                 dispath(authActions.setUsername(res_login.data["User"].userName))
-                toast.success("login success" + radioValue)
+                toast.success("login success " + radioValue)
                 if (radioValue == "driver")
                     navigate("/driver")
                 else
