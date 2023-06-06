@@ -1,0 +1,82 @@
+.ticket {
+    /* color: rgb(var(--red)); */
+    flex: 100%;
+    flex-grow: 0;
+    margin: 10px;
+    background-color: transparent;
+    transition: transform 0.2s, box-shadow 0.3s;
+}
+.ticket:hover {
+    transform: translateY(-5px);
+}
+.ticket:hover .header {
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
+}
+.ticket:hover .footer {
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
+}
+.ticket .header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: white;
+    padding: 20px;
+    padding-top: 30px;
+    width: 100%;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+.ticket .arrival {
+    text-align: right;
+}
+.ticket .car {
+    font-size: 20px;
+    margin-bottom: 2px;
+    color: rgb(var(--red));
+}
+.ticket .footer {
+    z-index: 10;
+    position: relative;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.6) 60%, rgba(255,255,255,0) 0%);
+    background-position: top;
+    background-size: 15px 1.5px;
+    background-repeat: repeat-x;
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+.rideStatus {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    padding: 0 15px;
+    transform: translateX(-50%);
+    background-color: blue;
+    color: white;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .ticket {
+        flex: 47%;
+        flex-grow: 0;
+    }
+
+}
+
+@media (min-width: 1200px) {
+    .ticket {
+        flex: 31.5%;
+        flex-grow: 0;
+    }
+}
+@media (min-width: 1300px) {
+    .ticket {
+        flex: 23.2%;
+        flex-grow: 0;
+    }
+}

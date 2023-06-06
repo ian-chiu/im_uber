@@ -1,0 +1,32 @@
+.pageContainer {
+  border: none;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.routePlanningButton {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header {
+  display: flex;
+  align-items: center;
+  padding-left: 0px;
+}
+.header .goBackIcon {
+  font-size: 30px;
+  margin-left: 5px;
+  margin-right: 10px;
+}
+.header .title {
+  font-size: 25px;
+}
+.submitButton {
+  margin: 10px;
+  border-radius: 20px;
+  border: none;
+}

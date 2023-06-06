@@ -1,0 +1,14 @@
+.tickets {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.searchContainer {
+    bottom: 0;
+    border-radius: 10px;
+    padding: 20px 0;
+    width: 100%;
+}
+.banner {
+    background-color: white;
+}
