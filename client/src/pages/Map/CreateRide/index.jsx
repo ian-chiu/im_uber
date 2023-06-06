@@ -6,31 +6,32 @@ import * as yup from "yup";
 import Datetime from "react-datetime";
 import Map from "../index";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import axios from "~/app/axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 const schema = yup.object().shape({
-  lisensePlate: yup.string().trim().min(1).max(100).required(),
+  licensePlate: yup.string().trim().min(1).max(100).required(),
   departureTime: yup.date().required(),
   maxPassengers: yup.number().integer().min(1).max(100).required(),
-  route: yup.array().min(2).required(),
 });
 
 const CreateRide = () => {
   const mapPageRef = useRef();
+  const navigate = useNavigate();
 
   const [show, setShow] = useState(false);
   const [stops, setStops] = useState([]);
   const [arrivalTimes, setArrivalTimes] = useState([]);
   const [values, setValues] = useState({
-    lisensePlate: "",
+    licensePlate: "",
     departureTime: new Date(),
     maxPassengers: 1,
-    route: "",
   });
   const [errors, setErrors] = useState({
-    lisensePlate: "",
+    licensePlate: "",
     departureTime: "",
     maxPassengers: "",
-    route: "",
   });
 
   const validateField = async (fieldName, value) => {
@@ -51,31 +52,67 @@ const CreateRide = () => {
     setShow(false);
   };
   const handleSubmit = () => {
-    validateField("lisensePlate", values.lisensePlate);
+    validateField("licensePlate", values.licensePlate);
     validateField("departureTime", values.departureTime);
     validateField("maxPassengers", values.maxPassengers);
-    validateField("route", values.route);
 
-    if (!!errors.lisensePlate || !!errors.departureTime || !!errors.maxPassengers || !!errors.route) {
-      console.log("Form submitted successfully");
+    if (stops.length < 2) {
+      toast.error("路線必需要有兩個站以上");
+    }
+
+    if (
+      errors.licensePlate.length === 0 &&
+      errors.departureTime.length === 0 &&
+      errors.maxPassengers.length === 0
+    ) {
+      axios
+        .post("/cars", {
+          departure_time: values.departureTime.toISOString(),
+          stops: stops.map((stop) => stop.name),
+          stops_eta: arrivalTimes.map((arrivalTime) => arrivalTime.toISOString()),
+          license_plate: values.licensePlate,
+          seats: values.maxPassengers,
+        })
+        .then((res) => {
+          toast.success("成功新增共乘");
+          navigate("/driver/ride");
+        })
+        .catch((err) => {
+          toast.error(err.response.data.message);
+        });
     }
   };
-  const handleLisensePlateChange = (event) => {
-    setValues((prevValues) => ({ ...prevValues, lisensePlate: event.target.value }));
+  const handleGoBack = () => {
+    navigate("/driver/ride");
+  };
+  const handlelicensePlateChange = (event) => {
+    setValues((prevValues) => ({ ...prevValues, licensePlate: event.target.value }));
   };
   const handleDepartureTimeChange = (moment) => {
     setValues((prevValues) => ({ ...prevValues, departureTime: moment }));
+    if (arrivalTimes.length > 0) {
+      const timeDiff =
+        moment.toDate().getTime() - new Date(values.departureTime.toISOString()).getTime();
+      setArrivalTimes((prevArrivalTimes) => {
+        return prevArrivalTimes.map((arrivalTime) => {
+          const updatedArrivalTime = new Date(arrivalTime);
+          updatedArrivalTime.setTime(arrivalTime.getTime() + timeDiff);
+          return updatedArrivalTime;
+        });
+      });
+    }
   };
   const handleMaxPassengersChange = (event) => {
     setValues((prevValues) => ({ ...prevValues, maxPassengers: event.target.value }));
   };
+  console.log(arrivalTimes);
 
   return (
     <>
       <Card className={styles.pageContainer}>
         <div>
           <Card.Header className={styles.header}>
-            <IoIosArrowBack className={styles.goBackIcon} />
+            <IoIosArrowBack className={styles.goBackIcon} onClick={handleGoBack} />
             <div className={styles.title}>新增行程</div>
           </Card.Header>
           <ListGroup variant="flush">
@@ -83,13 +120,13 @@ const CreateRide = () => {
               <FloatingLabel label="車牌號碼">
                 <Form.Control
                   type="text"
-                  name="lisensePlate"
-                  value={values.lisensePlate}
-                  onChange={handleLisensePlateChange}
+                  name="licensePlate"
+                  value={values.licensePlate}
+                  onChange={handlelicensePlateChange}
                   placeholder="placeholder"
-                  isInvalid={!!errors.lisensePlate}
+                  isInvalid={!!errors.licensePlate}
                 />
-                <Form.Control.Feedback type="invalid">{errors.lisensePlate}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.licensePlate}</Form.Control.Feedback>
               </FloatingLabel>
             </ListGroup.Item>
             <ListGroup.Item>

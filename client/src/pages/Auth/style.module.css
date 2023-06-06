@@ -20,6 +20,19 @@
     position: relative;
     flex: 1;
 }
+.registerNow {
+    display: flex;
+    width: 100%;
+    justify-content: end;
+    padding-top: 10px;
+}
+.registerNow a {
+    cursor: pointer;
+    padding-left: 3px;
+}
+.choose > div{
+    width: 100%;
+}
 
 @media (max-width: 768px) {
     .page {

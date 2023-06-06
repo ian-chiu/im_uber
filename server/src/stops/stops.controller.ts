@@ -1,12 +1,41 @@
-import { Controller, Get } from '@nestjs/common';
-import { StopsService } from './stops.service';
+import { Body, UseGuards, Controller, Get, Post } from '@nestjs/common';
+import { StopsService } from 'src/stops/stops.service';
+import { AuthenticatedGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthenticatedGuard)
 @Controller('stops')
 export class StopsController {
   constructor(private readonly stopsService: StopsService) {}
 
+  @Post()
+  async addStop(
+    @Body('name') stopName: string,
+    @Body('latitude') stopLatitude: number,
+    @Body('longitude') stopLongitude: number,
+  ) {
+    const result = await this.stopsService.insertStop(
+      stopName,
+      stopLatitude,
+      stopLongitude,
+    );
+    return {
+      msg: 'Stop successfully added',
+      stopId: result.id,
+      stopName: result.name,
+    };
+  }
+
   @Get()
-  getStops(): string {
-    return this.stopsService.getStops();
+  async getStops(): Promise<any> {
+    const stops = await this.stopsService.getStops();
+    const stopOut = stops.map((stop) => {
+      return {
+        id: stop.id,
+        name: stop.name,
+        latitude: stop.location.coordinates[1],
+        longitude: stop.location.coordinates[0],
+      };
+    });
+    return stopOut;
   }
 }

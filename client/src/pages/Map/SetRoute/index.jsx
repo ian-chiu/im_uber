@@ -31,7 +31,7 @@ const SetRoute = (props) => {
                     <div>{stop.name}</div>
                     <div>
                       {arrivalTimes
-                        ? `${arrivalTimes[index].date.getHours()}:${arrivalTimes[index].date
+                        ? `${arrivalTimes[index].getHours()}:${arrivalTimes[index]
                             .getMinutes()
                             .toString()
                             .padStart(2, "0")}`
