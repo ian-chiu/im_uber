@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { Car } from './cars.model';
-import { AuthenticatedGuard } from 'src/auth/auth.guard';
+import { AuthenticatedGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('cars')

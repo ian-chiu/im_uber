@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { StopSchema } from 'src/stops/stops.model';
-import { StopsService } from 'src/stops/stops.service';
-import { StopsController } from 'src/stops/stops.controller';
+import { StopSchema } from './stops.model';
+import { StopsService } from './stops.service';
+import { StopsController } from './stops.controller';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'stop', schema: StopSchema }])],

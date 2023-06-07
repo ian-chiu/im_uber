@@ -8,10 +8,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Car } from 'src/cars/cars.model';
-import { UsersService } from 'src/users/users.service';
-import { StopsService } from 'src/stops/stops.service';
-import { TicketsService } from 'src/tickets/tickets.service';
+import { Car } from './cars.model';
+import { UsersService } from '../users/users.service';
+import { StopsService } from '../stops/stops.service';
+import { TicketsService } from '../tickets/tickets.service';
 
 @Injectable()
 export class CarsService {

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from 'src/app.controller';
-import { AppService } from 'src/app.service';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import { StopsModule } from './stops/stops.module';
 import { CarsModule } from './cars/cars.module';
 import { TicketsModule } from './tickets/tickets.module';

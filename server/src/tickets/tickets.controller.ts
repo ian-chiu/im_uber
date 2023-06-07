@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
-import { AuthenticatedGuard } from 'src/auth/auth.guard';
+import { AuthenticatedGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('tickets')

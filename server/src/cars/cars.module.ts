@@ -3,10 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CarsController } from './cars.controller';
 import { CarsService } from './cars.service';
 import { CarSchema } from './cars.model';
-import { UsersModule } from 'src/users/users.module';
-import { StopsModule } from 'src/stops/stops.module';
+import { UsersModule } from '../users/users.module';
+import { StopsModule } from '../stops/stops.module';
 import { Client } from '@googlemaps/google-maps-services-js';
-import { TicketsModule } from 'src/tickets/tickets.module';
+import { TicketsModule } from '../tickets/tickets.module';
 
 @Module({
   imports: [

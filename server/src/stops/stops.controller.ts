@@ -1,6 +1,6 @@
 import { Body, UseGuards, Controller, Get, Post } from '@nestjs/common';
-import { StopsService } from 'src/stops/stops.service';
-import { AuthenticatedGuard } from 'src/auth/auth.guard';
+import { StopsService } from './stops.service';
+import { AuthenticatedGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('stops')

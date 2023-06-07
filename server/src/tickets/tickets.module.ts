@@ -1,9 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TicketsService } from 'src/tickets/tickets.service';
-import { TicketSchema } from 'src/tickets/tickets.model';
-import { UsersModule } from 'src/users/users.module';
-import { CarsModule } from 'src/cars/cars.module';
+import { TicketsService } from './tickets.service';
+import { TicketSchema } from './tickets.model';
+import { UsersModule } from '../users/users.module';
+import { CarsModule } from '../cars/cars.module';
 import { TicketsController } from './tickets.controller';
 
 @Module({
