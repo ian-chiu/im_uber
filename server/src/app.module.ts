@@ -21,7 +21,7 @@ import { TicketsModule } from './tickets/tickets.module';
         const dbConnectionMode = configService.get('DATABASE_CONNECTION_MODE');
         let dbUri = '';
         if (dbConnectionMode === 'local') {
-          dbUri = `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/uber?retryWrites=true&w=majority`;
+          dbUri = `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/uber?authSource=admin&retryWrites=true&w=majority`;
         } else {
           dbUri = `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/uber?retryWrites=true&w=majority`;
         }
